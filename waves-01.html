@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waves · IGCSE Physics · Teacher Alex</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(145deg, #f5f9ff 0%, #dae5f0 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .app-container {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-radius: 48px;
+      box-shadow: 0 30px 50px rgba(0, 20, 40, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
+      padding: 32px 30px;
+      transition: 0.3s;
+    }
+    h1, h2, h3 {
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .badge {
+      background: #1e3c72;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .teacher {
+      background: #2b5876;
+    }
+    .score-board {
+      background: #ffffffd9;
+      border-radius: 40px;
+      padding: 8px 22px;
+      font-weight: 600;
+      color: #0b2b4a;
+      border: 1px solid #b7d0e5;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+      font-size: 1.1rem;
+    }
+    .score-board span {
+      color: #1e6f9f;
+      font-size: 1.4rem;
+      margin-left: 8px;
+    }
+    .cover, .quiz, .result {
+      transition: opacity 0.3s ease;
+    }
+    .cover {
+      text-align: center;
+      padding: 20px 10px;
+    }
+    .cover h2 {
+      font-size: 2rem;
+      color: #0b2b4a;
+      margin-bottom: 10px;
+    }
+    .cover h3 {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #2c5778;
+      margin-bottom: 28px;
+    }
+    .cover input {
+      width: 80%;
+      max-width: 350px;
+      padding: 16px 22px;
+      border-radius: 60px;
+      border: 1px solid #b7d0e5;
+      background: white;
+      font-size: 1.1rem;
+      outline: none;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02), 0 6px 12px rgba(0,0,0,0.05);
+      margin-bottom: 25px;
+      transition: 0.2s;
+      text-align: center;
+    }
+    .cover input:focus {
+      border-color: #1e6f9f;
+      box-shadow: 0 0 0 4px rgba(30,111,159,0.15);
+    }
+    .btn {
+      background: #1e3c72;
+      color: white;
+      border: none;
+      padding: 14px 38px;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      box-shadow: 0 12px 18px -6px rgba(20, 50, 90, 0.4);
+      transition: 0.15s;
+      border: 1px solid #ffffff50;
+    }
+    .btn:hover {
+      background: #0f2b4f;
+      transform: scale(1.02);
+      box-shadow: 0 16px 24px -6px rgba(20, 50, 90, 0.5);
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn.secondary {
+      background: #ffffff;
+      color: #1e3c72;
+      border: 1.5px solid #1e3c72;
+      box-shadow: 0 8px 14px -8px rgba(0,0,0,0.2);
+    }
+    .btn.secondary:hover {
+      background: #e9f0f9;
+    }
+    .quiz {
+      display: none;
+    }
+    .question-text {
+      font-size: 1.4rem;
+      font-weight: 500;
+      line-height: 1.5;
+      margin: 25px 0 30px 0;
+      color: #0b2b4a;
+      padding: 0 6px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .option {
+      background: white;
+      border: 1.5px solid #d0e0ee;
+      border-radius: 60px;
+      padding: 16px 24px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #103450;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      text-align: left;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .option:hover:not(.disabled-option) {
+      background: #e6f0fc;
+      border-color: #6f9fcf;
+      transform: translateX(6px);
+    }
+    .option.selected {
+      background: #d2e6ff;
+      border-color: #1e6f9f;
+      box-shadow: 0 0 0 2px #1e6f9f40;
+    }
+    .option.correct-highlight {
+      background: #c8f0d1;
+      border-color: #2e7d5e;
+    }
+    .option.wrong-highlight {
+      background: #ffe0e0;
+      border-color: #c0392b;
+    }
+    .option.disabled-option {
+      cursor: default;
+      opacity: 0.9;
+    }
+    .option .letter {
+      background: #ffffffc0;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: 700;
+      color: #1e3c72;
+      border: 1px solid #b7d0e5;
+      flex-shrink: 0;
+    }
+    .feedback {
+      background: #f0f7ff;
+      border-radius: 28px;
+      padding: 16px 24px;
+      margin-top: 6px;
+      border-left: 6px solid #1e6f9f;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    .feedback strong {
+      color: #0b2b4a;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+    }
+    .result {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .result h2 {
+      font-size: 2rem;
+      color: #0b2b4a;
+      margin-bottom: 16px;
+    }
+    .final-score {
+      font-size: 4rem;
+      font-weight: 700;
+      color: #1e6f9f;
+      line-height: 1;
+      margin: 16px 0;
+    }
+    .review-list {
+      text-align: left;
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 24px 0;
+      padding-right: 6px;
+    }
+    .review-item {
+      background: #fff;
+      border-radius: 20px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      border-left: 6px solid #c0392b;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .review-item.correct-item {
+      border-left-color: #2e7d5e;
+    }
+    .review-item p {
+      margin: 6px 0;
+    }
+    .small-meta {
+      font-size: 0.85rem;
+      color: #5b7c99;
+      margin-top: 8px;
+    }
+    .highlight-code {
+      background: #0b2b4a;
+      color: #d4edff;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      word-break: break-all;
+      margin: 20px 0 10px;
+      border: 1px solid #5f8db0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .highlight-code span {
+      background: #ffd966;
+      color: #0b2b4a;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .footer-note {
+      font-size: 0.8rem;
+      color: #6988a3;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <!-- HEADER with teacher and score -->
+  <div class="header">
+    <div class="badge teacher">👨‍🏫 Teacher Alex · IGCSE Physics</div>
+    <div class="badge">📘 Pearson Edexcel Waves</div>
+    <div class="score-board" id="scoreDisplay">Score <span id="scoreValue">0</span></div>
+  </div>
+
+  <!-- GOOGLE SHEETS PLACEHOLDER (HIGHLIGHTED) -->
+  <div class="highlight-code">
+    <span>📌 PASTE GOOGLE APPS SCRIPT URL BELOW (inside submitToSheet function)</span>
+    <code style="color:#b7e0ff;">const SCRIPT_URL = 'https://script.google.com/macros/s/···/exec';</code>
+  </div>
+  <div style="font-size:0.85rem; margin-bottom:20px; color:#2c5778; background:#fff6d9; padding:8px 18px; border-radius:40px;">
+    ⚠️ Replace the placeholder URL inside the function <strong>submitToSheet()</strong> — only first attempt score is sent.
+  </div>
+
+  <!-- COVER SECTION -->
+  <div id="coverSection" class="cover">
+    <h2>🌊 Waves Homework</h2>
+    <h3>IGCSE · Pearson Edexcel · Teacher Alex</h3>
+    <p style="margin-bottom: 28px; color: #2c5778;">Enter your full name to begin</p>
+    <input type="text" id="studentName" placeholder="e.g. Jamie Chen" autocomplete="off">
+    <br>
+    <button class="btn" id="startBtn">Start Quiz →</button>
+    <div class="footer-note">25 questions · one attempt · score updates live</div>
+  </div>
+
+  <!-- QUIZ SECTION (one question at a time) -->
+  <div id="quizSection" class="quiz">
+    <div class="question-text" id="questionText">Loading…</div>
+    <div class="options" id="optionsContainer"></div>
+    <div id="feedbackContainer" class="feedback hidden"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" id="prevBtn" disabled>← Previous</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- RESULT SECTION -->
+  <div id="resultSection" class="result">
+    <h2>📋 Quiz Complete</h2>
+    <div class="final-score" id="finalScore">0/25</div>
+    <p style="color: #2c5778; margin-bottom: 12px;">Here are your incorrect answers (with explanations):</p>
+    <div class="review-list" id="reviewList"></div>
+    <button class="btn" id="restartBtn">Try again (new attempt)</button>
+  </div>
+</div>
+
+<script>
+  // ========== PASTE YOUR GOOGLE SHEETS URL HERE ==========
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5-uedUZMkZMtjVECaYhmjjPQWdw0D72tYeEFIBx2Qk9yKWv_5laJSOVl756axwZ3m/exec';  // <-- REPLACE WITH YOUR URL
+  // =======================================================
+
+  // ---------- 25 PEARSON EDEXCEL STYLE WAVES QUESTIONS ----------
+  const questions = [
+    {
+      question: "What does a frequency of 200 Hz mean?",
+      options: ["200 waves pass a point in 1 second", "200 seconds pass per wave", "200 waves are produced in 1 minute", "The wave travels 200 metres per second"],
+      correct: 0,
+      explanation: "Frequency (Hz) = number of complete waves per second. So 200 Hz means 200 waves pass a fixed point each second."
+    },
+    {
+      question: "16 waves pass a point in 8 seconds. What is the frequency?",
+      options: ["0.5 Hz", "2 Hz", "8 Hz", "128 Hz"],
+      correct: 1,
+      explanation: "Frequency = number of waves / time = 16 / 8 = 2 Hz."
+    },
+    {
+      question: "Which type of wave requires a medium to travel?",
+      options: ["Light wave", "Sound wave", "Radio wave", "Microwave"],
+      correct: 1,
+      explanation: "Sound is a mechanical wave and needs a material medium (solid, liquid, gas). Light and radio are electromagnetic and can travel through vacuum."
+    },
+    {
+      question: "In a transverse wave, the particles vibrate...",
+      options: ["parallel to wave direction", "perpendicular to wave direction", "in a circular motion", "along the wave direction"],
+      correct: 1,
+      explanation: "Transverse waves: oscillation is perpendicular (at 90°) to the direction of energy transfer. E.g., light, water ripples."
+    },
+    {
+      question: "Which of these is a longitudinal wave?",
+      options: ["Water wave", "Light wave", "Sound wave", "Wave on a string"],
+      correct: 2,
+      explanation: "Longitudinal waves have particles vibrating parallel to wave direction. Sound is the classic example."
+    },
+    {
+      question: "The distance between two consecutive crests is called the...",
+      options: ["Amplitude", "Period", "Wavelength", "Frequency"],
+      correct: 2,
+      explanation: "Wavelength (λ) is the distance between two identical points on consecutive waves, e.g., crest to crest."
+    },
+    {
+      question: "What is the amplitude of a wave?",
+      options: ["Distance between two troughs", "Maximum displacement from rest position", "Number of waves per second", "Time for one wave"],
+      correct: 1,
+      explanation: "Amplitude is the maximum displacement of a point on the wave from its undisturbed (rest) position."
+    },
+    {
+      question: "A wave has frequency 50 Hz. What is its period?",
+      options: ["0.02 s", "0.2 s", "2 s", "50 s"],
+      correct: 0,
+      explanation: "Period T = 1 / f = 1 / 50 = 0.02 seconds."
+    },
+    {
+      question: "Which equation correctly relates wave speed, frequency and wavelength?",
+      options: ["v = f / λ", "v = λ / f", "v = f × λ", "v = f + λ"],
+      correct: 2,
+      explanation: "Wave speed (v) = frequency (f) × wavelength (λ)."
+    },
+    {
+      question: "A wave has wavelength 2 m and frequency 10 Hz. What is its speed?",
+      options: ["0.2 m/s", "5 m/s", "20 m/s", "12 m/s"],
+      correct: 2,
+      explanation: "v = f × λ = 10 Hz × 2 m = 20 m/s."
+    },
+    {
+      question: "In a longitudinal wave, what is a compression?",
+      options: ["Region of high pressure", "Region of low pressure", "Region of maximum amplitude", "Region of zero displacement"],
+      correct: 0,
+      explanation: "Compressions are regions where particles are closer together (high pressure/density). Rarefactions are low pressure."
+    },
+    {
+      question: "Which one is an example of a transverse wave?",
+      options: ["Sound in air", "Ultrasound in water", "Vibrations on a guitar string", "Compression in a spring"],
+      correct: 2,
+      explanation: "Waves on a string (guitar) are transverse — the string moves up/down while wave travels along."
+    },
+    {
+      question: "The time for one complete wave to pass a point is called...",
+      options: ["Wavelength", "Frequency", "Period", "Amplitude"],
+      correct: 2,
+      explanation: "Period (T) is the time taken for one complete wave cycle, measured in seconds."
+    },
+    {
+      question: "If a wave’s frequency doubles while speed stays constant, what happens to wavelength?",
+      options: ["Doubles", "Halves", "Stays same", "Quadruples"],
+      correct: 1,
+      explanation: "v = f λ. If v constant and f doubles, λ must halve (inverse relationship)."
+    },
+    {
+      question: "Which of the following statements about electromagnetic waves is true?",
+      options: ["They need a medium", "They are longitudinal", "They can travel through vacuum", "They are sound waves"],
+      correct: 2,
+      explanation: "All EM waves (light, radio, X-rays) are transverse and can propagate through vacuum."
+    },
+    {
+      question: "A student counts 30 waves passing in 10 s. What is the frequency and period?",
+      options: ["f=3 Hz, T=0.33 s", "f=0.3 Hz, T=3.33 s", "f=10 Hz, T=0.1 s", "f=30 Hz, T=0.03 s"],
+      correct: 0,
+      explanation: "f = 30/10 = 3 Hz; T = 1/f = 0.33 s (approx)."
+    },
+    {
+      question: "Which part of a transverse wave is the lowest point?",
+      options: ["Crest", "Trough", "Compression", "Rarefaction"],
+      correct: 1,
+      explanation: "Trough is the minimum (lowest) point of a transverse wave. Crest is the highest."
+    },
+    {
+      question: "What is the speed of a wave with period 0.5 s and wavelength 4 m?",
+      options: ["2 m/s", "4 m/s", "8 m/s", "0.125 m/s"],
+      correct: 2,
+      explanation: "f = 1/T = 2 Hz; v = f×λ = 2×4 = 8 m/s."
+    },
+    {
+      question: "Which wave property is defined as the number of vibrations per second?",
+      options: ["Period", "Wavelength", "Frequency", "Amplitude"],
+      correct: 2,
+      explanation: "Frequency (f) is the number of complete vibrations (waves) per second, measured in hertz (Hz)."
+    },
+    {
+      question: "Which of these waves is longitudinal?",
+      options: ["Microwave", "Infrared", "Ultrasound", "Visible light"],
+      correct: 2,
+      explanation: "Ultrasound is a high-frequency sound wave, which is longitudinal. Microwaves, infrared and light are EM (transverse)."
+    },
+    {
+      question: "A wave has amplitude 0.5 m. What does this mean?",
+      options: ["The wave is 0.5 m long", "The wave travels 0.5 m per second", "The maximum displacement is 0.5 m", "The frequency is 0.5 Hz"],
+      correct: 2,
+      explanation: "Amplitude = max displacement from rest. So 0.5 m means particles move 0.5 m from the middle."
+    },
+    {
+      question: "Which equation gives the period T from frequency f?",
+      options: ["T = f", "T = 1/f", "T = f²", "T = 2f"],
+      correct: 1,
+      explanation: "Period T = 1 / frequency."
+    },
+    {
+      question: "In 3 seconds, 12 waves pass a point. What is the frequency?",
+      options: ["4 Hz", "3 Hz", "12 Hz", "0.25 Hz"],
+      correct: 0,
+      explanation: "Frequency = number of waves / time = 12 / 3 = 4 Hz."
+    },
+    {
+      question: "Which statement about a rarefaction is correct?",
+      options: ["It occurs in transverse waves", "It is a region of low pressure", "It is the same as a trough", "It has maximum amplitude"],
+      correct: 1,
+      explanation: "Rarefaction is a region of lower pressure/density in a longitudinal wave, where particles are spread apart."
+    },
+    {
+      question: "A wave has frequency 0.25 Hz. What is its period?",
+      options: ["0.25 s", "2.5 s", "4 s", "0.4 s"],
+      correct: 2,
+      explanation: "T = 1/f = 1 / 0.25 = 4 seconds."
+    }
+  ];
+
+  // ---------- STATE ----------
+  let currentIndex = 0;
+  let userAnswers = new Array(questions.length).fill(null); // stores selected option index (0-3) or null
+  let score = 0;
+  let quizFinished = false;
+  let studentName = "";
+  let submittedToSheet = false; // only submit once (first attempt)
+
+  // DOM elements
+  const coverSection = document.getElementById('coverSection');
+  const quizSection = document.getElementById('quizSection');
+  const resultSection = document.getElementById('resultSection');
+  const studentNameInput = document.getElementById('studentName');
+  const startBtn = document.getElementById('startBtn');
+  const questionText = document.getElementById('questionText');
+  const optionsContainer = document.getElementById('optionsContainer');
+  const feedbackContainer = document.getElementById('feedbackContainer');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const scoreValue = document.getElementById('scoreValue');
+  const finalScore = document.getElementById('finalScore');
+  const reviewList = document.getElementById('reviewList');
+  const restartBtn = document.getElementById('restartBtn');
+
+  // ---------- HELPER: update score display ----------
+  function updateScoreDisplay() {
+    scoreValue.textContent = score;
+  }
+
+  // ---------- RENDER QUESTION ----------
+  function renderQuestion(index) {
+    const q = questions[index];
+    questionText.textContent = `${index+1}. ${q.question}`;
+    optionsContainer.innerHTML = '';
+    feedbackContainer.classList.add('hidden');
+    feedbackContainer.innerHTML = '';
+
+    // Build options
+    q.options.forEach((opt, optIndex) => {
+      const btn = document.createElement('div');
+      btn.classList.add('option');
+      btn.dataset.optIndex = optIndex;
+      const letter = String.fromCharCode(65 + optIndex); // A,B,C,D
+      btn.innerHTML = `<span class="letter">${letter}</span> ${opt}`;
+
+      if (userAnswers[index] === optIndex) {
+        btn.classList.add('selected');
+      }
+
+      btn.addEventListener('click', () => onOptionClick(index, optIndex));
+      optionsContainer.appendChild(btn);
+    });
+
+    // Show feedback if already answered (and not in finished review mode? we handle)
+    const answered = userAnswers[index] !== null;
+    if (answered) {
+      showFeedbackForCurrent(index);
+    } else {
+      // remove any highlight classes and keep disabled? no, options clickable
+      enableOptions(true);
+    }
+
+    // If already answered, we still allow review but disable selection (because one attempt)
+    if (answered) {
+      // disable further clicks
+      document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled-option'));
+      // show feedback
+      showFeedbackForCurrent(index);
+    } else {
+      document.querySelectorAll('.option').forEach(opt => opt.classList.remove('disabled-option'));
+    }
+
+    // Manage navigation buttons
+    prevBtn.disabled = (index === 0);
+    // next button changes text if last question
+    if (index === questions.length - 1) {
+      nextBtn.textContent = 'Finish';
+    } else {
+      nextBtn.textContent = 'Next →';
+    }
+
+    // If quiz already finished (should not happen in normal flow) but safe
+  }
+
+  // Show feedback for the current question based on userAnswers
+  function showFeedbackForCurrent(index) {
+    const q = questions[index];
+    const selected = userAnswers[index];
+    if (selected === null) return;
+
+    const isCorrect = (selected === q.correct);
+    // Highlight correct and wrong options
+    const allOptions = document.querySelectorAll('.option');
+    allOptions.forEach((opt, i) => {
+      opt.classList.remove('correct-highlight', 'wrong-highlight');
+      if (i === q.correct) {
+        opt.classList.add('correct-highlight');
+      } else if (i === selected && i !== q.correct) {
+        opt.classList.add('wrong-highlight');
+      }
+    });
+
+    // Show explanation feedback
+    feedbackContainer.classList.remove('hidden');
+    const correctLetter = String.fromCharCode(65 + q.correct);
+    const correctText = q.options[q.correct];
+    if (isCorrect) {
+      feedbackContainer.innerHTML = `<strong>✅ Correct!</strong> ${q.explanation}`;
+    } else {
+      const selectedLetter = String.fromCharCode(65 + selected);
+      feedbackContainer.innerHTML = `<strong>❌ Incorrect.</strong> The correct answer is <strong>${correctLetter}: ${correctText}</strong>.<br><span style="display:block; margin-top:8px;">📘 ${q.explanation}</span>`;
+    }
+  }
+
+  // Enable or disable options clicks
+  function enableOptions(enable) {
+    // not used globally, but we manage per question
+  }
+
+  // ---------- OPTION CLICK HANDLER ----------
+  function onOptionClick(qIndex, optIndex) {
+    // if already answered, ignore
+    if (userAnswers[qIndex] !== null) return;
+
+    // record answer (first attempt)
+    userAnswers[qIndex] = optIndex;
+
+    // check correctness and update score
+    const isCorrect = (optIndex === questions[qIndex].correct);
+    if (isCorrect) {
+      score++;
+    }
+    updateScoreDisplay();
+
+    // re-render to show highlights and feedback (but we need to keep event listeners from re-rendering)
+    // Instead of full re-render, just update visuals and disable options.
+    const q = questions[qIndex];
+    const allOptions = document.querySelectorAll('.option');
+    allOptions.forEach((opt, i) => {
+      opt.classList.remove('selected', 'correct-highlight', 'wrong-highlight');
+      if (i === optIndex) opt.classList.add('selected');
+      if (i === q.correct) opt.classList.add('correct-highlight');
+      if (i === optIndex && i !== q.correct) opt.classList.add('wrong-highlight');
+      opt.classList.add('disabled-option');
+    });
+
+    // show feedback
+    feedbackContainer.classList.remove('hidden');
+    const correctLetter = String.fromCharCode(65 + q.correct);
+    const correctText = q.options[q.correct];
+    if (isCorrect) {
+      feedbackContainer.innerHTML = `<strong>✅ Correct!</strong> ${q.explanation}`;
+    } else {
+      const selectedLetter = String.fromCharCode(65 + optIndex);
+      feedbackContainer.innerHTML = `<strong>❌ Incorrect.</strong> The correct answer is <strong>${correctLetter}: ${correctText}</strong>.<br><span style="display:block; margin-top:8px;">📘 ${q.explanation}</span>`;
+    }
+
+    // No further clicks on this question
+  }
+
+  // ---------- NAVIGATION ----------
+  function goToNext() {
+    if (currentIndex < questions.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      // finish button pressed
+      finishQuiz();
+    }
+  }
+
+  function goToPrev() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  }
+
+  // ---------- FINISH QUIZ ----------
+  function finishQuiz() {
+    quizFinished = true;
+    quizSection.style.display = 'none';
+    resultSection.style.display = 'block';
+
+    // compute final score (already tracked)
+    finalScore.textContent = `${score}/${questions.length}`;
+
+    // Build review of incorrect answers
+    reviewList.innerHTML = '';
+    let incorrectCount = 0;
+    questions.forEach((q, idx) => {
+      const selected = userAnswers[idx];
+      if (selected !== null && selected !== q.correct) {
+        incorrectCount++;
+        const reviewDiv = document.createElement('div');
+        reviewDiv.classList.add('review-item');
+        const selectedLetter = String.fromCharCode(65 + selected);
+        const correctLetter = String.fromCharCode(65 + q.correct);
+        reviewDiv.innerHTML = `
+          <p><strong>Q${idx+1}: ${q.question}</strong></p>
+          <p>❌ Your answer: ${selectedLetter}) ${q.options[selected]}</p>
+          <p>✅ Correct: ${correctLetter}) ${q.options[q.correct]}</p>
+          <p class="small-meta">📘 ${q.explanation}</p>
+        `;
+        reviewList.appendChild(reviewDiv);
+      }
+    });
+    if (incorrectCount === 0) {
+      reviewList.innerHTML = '<p style="text-align:center; padding:20px;">🎉 Perfect! You got all answers correct!</p>';
+    }
+
+    // Submit to Google Sheets (only once, first attempt, only score)
+    if (!submittedToSheet) {
+      submitToSheet(studentName, score, questions.length);
+      submittedToSheet = true;
+    }
+  }
+
+  // ---------- GOOGLE SHEETS SUBMISSION ----------
+  function submitToSheet(name, scoreVal, total) {
+    // Highlighted: paste your Google Apps Script URL in SCRIPT_URL variable (top of script)
+    if (!SCRIPT_URL || SCRIPT_URL.includes('···')) {
+      console.warn('Google Sheets URL not set. Score not sent.');
+      return;
+    }
+
+    const payload = {
+      name: name,
+      score: scoreVal,
+      total: total,
+      firstAttempt: true
+    };
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // typical for Apps Script
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => console.log('Score sent to Google Sheets'))
+    .catch(err => console.error('Error sending to sheet:', err));
+  }
+
+  // ---------- START QUIZ ----------
+  function startQuiz() {
+    const name = studentNameInput.value.trim();
+    if (!name) {
+      alert('Please enter your name before starting.');
+      return;
+    }
+    studentName = name;
+
+    // reset state for fresh attempt
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false;
+
+    coverSection.style.display = 'none';
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+
+    renderQuestion(0);
+  }
+
+  // ---------- RESTART (new attempt) ----------
+  function restartQuiz() {
+    // reset everything, but keep name
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false; // allow new submission for new attempt (but only first attempt from this session gets sent? yes, new attempt new submission)
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    coverSection.style.display = 'none';
+    // do not clear student name
+    renderQuestion(0);
+  }
+
+  // ---------- EVENT LISTENERS ----------
+  startBtn.addEventListener('click', startQuiz);
+  studentNameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') startQuiz();
+  });
+  prevBtn.addEventListener('click', goToPrev);
+  nextBtn.addEventListener('click', goToNext);
+  restartBtn.addEventListener('click', restartQuiz);
+
+  // initial
+  quizSection.style.display = 'none';
+  resultSection.style.display = 'none';
+  updateScoreDisplay();
+</script>
+</body>
+</html>
