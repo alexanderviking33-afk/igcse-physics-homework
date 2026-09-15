@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Year 9 Homework · Tr. Allex · Bahlool British International School</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(145deg, #f5f9ff 0%, #dae5f0 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hub {
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 40px;
+      box-shadow: 0 30px 50px rgba(0, 20, 40, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
+      padding: 40px 36px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .badge {
+      background: #1e3c72;
+      color: white;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .badge.teacher { background: #2b5876; }
+    h1 {
+      font-size: 1.9rem;
+      color: #0b2b4a;
+      margin: 10px 0 4px;
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      font-size: 1.05rem;
+      color: #2b5876;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      color: #5b7c99;
+      font-size: 0.95rem;
+      margin-bottom: 30px;
+    }
+    .back-link {
+      display: inline-block;
+      font-size: 0.9rem;
+      color: #1e6f9f;
+      text-decoration: none;
+      margin-bottom: 14px;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .topic {
+      margin-bottom: 30px;
+      background: #f7fbff;
+      border-radius: 28px;
+      padding: 22px 26px;
+      border: 1px solid #dbe8f5;
+    }
+    .topic-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .topic-icon {
+      width: 46px; height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #d9ebff;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .topic-title { font-size: 1.3rem; font-weight: 700; color: #0b2b4a; }
+    .topic-desc  { font-size: 0.9rem; color: #5b7c99; margin-top: 2px; }
+    .hw-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 640px) {
+      .hw-list { grid-template-columns: 1fr 1fr; }
+    }
+    .hw-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: white;
+      border: 1.5px solid #d0e0ee;
+      border-radius: 50px;
+      padding: 14px 22px;
+      text-decoration: none;
+      color: #103450;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+    }
+    .hw-link:hover {
+      background: #e6f0fc;
+      border-color: #6f9fcf;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 18px -8px rgba(30, 111, 159, 0.35);
+    }
+    .hw-link .num {
+      width: 34px; height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #d9ebff;
+      border-radius: 50%;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1e3c72;
+      flex-shrink: 0;
+    }
+    .hw-link .label { display: flex; flex-direction: column; line-height: 1.25; }
+    .hw-link .label small {
+      font-size: 0.75rem;
+      color: #5b7c99;
+      font-weight: 400;
+      margin-top: 3px;
+    }
+    .hw-link.disabled {
+      opacity: 0.55;
+      pointer-events: none;
+      background: #f1f5f9;
+      border-style: dashed;
+    }
+    .footer { text-align: center; margin-top: 26px; font-size: 0.8rem; color: #6988a3; }
+  </style>
+</head>
+<body>
+  <div class="hub">
+    <div class="header">
+      <div class="badge teacher">👨‍🏫 Tr. Allex</div>
+      <div class="badge">📘 IGCSE Physics · Pearson Edexcel</div>
+    </div>
+
+    <a class="back-link" href="../">← Back to class selection</a>
+
+    <h1>Year 9 Physics Homework</h1>
+    <h2>Bahlool British International School</h2>
+    <p class="subtitle">Pick your homework below. Your first-attempt score is sent to the teacher automatically.</p>
+
+    <div class="topic">
+      <div class="topic-header">
+        <span class="topic-icon">🏋️</span>
+        <div>
+          <div class="topic-title">Forces &amp; Motion</div>
+          <div class="topic-desc">Speed · Acceleration · Newton's laws · Moments · Momentum</div>
+        </div>
+      </div>
+      <div class="hw-list">
+        <a class="hw-link disabled" href="#">
+          <span class="num">—</span>
+          <span class="label">Not yet available<small>Teacher will announce</small></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-header">
+        <span class="topic-icon">⚡</span>
+        <div>
+          <div class="topic-title">Electricity</div>
+          <div class="topic-desc">Circuits · Current · Voltage · Resistance · Power</div>
+        </div>
+      </div>
+      <div class="hw-list">
+        <a class="hw-link disabled" href="#">
+          <span class="num">—</span>
+          <span class="label">Not yet available<small>Teacher will announce</small></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-header">
+        <span class="topic-icon">🔋</span>
+        <div>
+          <div class="topic-title">Energy Resources &amp; Energy Transfer</div>
+          <div class="topic-desc">Types of energy · Conservation · Efficiency · Power stations</div>
+        </div>
+      </div>
+      <div class="hw-list">
+        <a class="hw-link disabled" href="#">
+          <span class="num">—</span>
+          <span class="label">Not yet available<small>Teacher will announce</small></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-header">
+        <span class="topic-icon">💧</span>
+        <div>
+          <div class="topic-title">Solids, Liquids &amp; Gases — Part 1</div>
+          <div class="topic-desc">States of matter · Particle model · Changes of state · Heating curves</div>
+        </div>
+      </div>
+      <div class="hw-list">
+        <a class="hw-link disabled" href="#">
+          <span class="num">—</span>
+          <span class="label">Not yet available<small>Teacher will announce</small></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer">
+      © Tr. Allex · Bahlool British International School
+    </div>
+  </div>
+</body>
+</html>
