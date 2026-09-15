@@ -3,34 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Homework Hub · IGCSE Physics · Teacher Alex</title>
+  <title>Homework Hub · Tr. Allex · Bahlool British International School</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
       background: linear-gradient(145deg, #f5f9ff 0%, #dae5f0 100%);
       min-height: 100vh;
-      padding: 40px 20px;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
+      padding: 20px;
     }
-    .hub {
+    .app-container {
       width: 100%;
-      max-width: 1000px;
+      max-width: 900px;
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(12px);
-      border-radius: 40px;
+      border-radius: 48px;
       box-shadow: 0 30px 50px rgba(0, 20, 40, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
       padding: 40px 36px;
+      text-align: center;
     }
-    .header {
+    .badge-row {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+      justify-content: center;
       gap: 12px;
-      margin-bottom: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 26px;
     }
     .badge {
       background: #1e3c72;
@@ -43,261 +43,108 @@
     }
     .badge.teacher { background: #2b5876; }
     h1 {
-      font-size: 2rem;
+      font-size: 2.1rem;
       color: #0b2b4a;
-      margin: 12px 0 10px;
+      margin-bottom: 8px;
       letter-spacing: -0.02em;
     }
+    h2 {
+      font-size: 1.15rem;
+      color: #2b5876;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
     .subtitle {
-      color: #2c5778;
-      font-size: 1.05rem;
-      margin-bottom: 34px;
-    }
-
-    /* ---------- TOPIC SECTIONS ---------- */
-    .topic {
-      margin-bottom: 34px;
-      background: #f7fbff;
-      border-radius: 28px;
-      padding: 22px 26px;
-      border: 1px solid #dbe8f5;
-    }
-    .topic-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .topic-icon {
-      width: 46px;
-      height: 46px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #d9ebff;
-      border-radius: 50%;
-      font-size: 1.4rem;
-      flex-shrink: 0;
-    }
-    .topic-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #0b2b4a;
-    }
-    .topic-desc {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: #5b7c99;
-      margin-top: 2px;
+      margin-bottom: 34px;
     }
-
-    /* ---------- HOMEWORK LIST ---------- */
-    .hw-list {
+    .pick {
+      font-size: 1.1rem;
+      color: #2c5778;
+      margin-bottom: 22px;
+    }
+    .class-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 10px;
+      gap: 16px;
+      max-width: 640px;
+      margin: 0 auto;
     }
-    @media (min-width: 640px) {
-      .hw-list { grid-template-columns: 1fr 1fr; }
+    @media (min-width: 620px) {
+      .class-grid { grid-template-columns: 1fr 1fr; }
     }
-    .hw-link {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: white;
-      border: 1.5px solid #d0e0ee;
-      border-radius: 50px;
-      padding: 14px 22px;
-      text-decoration: none;
-      color: #103450;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: all 0.15s ease;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.03);
-    }
-    .hw-link:hover {
-      background: #e6f0fc;
-      border-color: #6f9fcf;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 18px -8px rgba(30, 111, 159, 0.35);
-    }
-    .hw-link .num {
-      width: 34px;
-      height: 34px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #d9ebff;
-      border-radius: 50%;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #1e3c72;
-      flex-shrink: 0;
-    }
-    .hw-link .label {
+    .class-card {
       display: flex;
       flex-direction: column;
-      line-height: 1.25;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border: 1.5px solid #d0e0ee;
+      border-radius: 40px;
+      padding: 32px 22px;
+      text-decoration: none;
+      color: #103450;
+      font-weight: 600;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+      transition: all 0.15s ease;
     }
-    .hw-link .label small {
-      font-size: 0.75rem;
+    .class-card:hover {
+      background: #e6f0fc;
+      border-color: #6f9fcf;
+      transform: translateY(-3px);
+      box-shadow: 0 14px 24px -8px rgba(30, 111, 159, 0.35);
+    }
+    .class-icon {
+      font-size: 2.6rem;
+      line-height: 1;
+    }
+    .class-name {
+      font-size: 1.35rem;
+      color: #0b2b4a;
+    }
+    .class-desc {
+      font-size: 0.85rem;
       color: #5b7c99;
       font-weight: 400;
-      margin-top: 3px;
     }
-
-    /* ---------- DISABLED / COMING SOON ---------- */
-    .hw-link.disabled {
-      opacity: 0.55;
-      pointer-events: none;
-      background: #f1f5f9;
-      border-style: dashed;
-    }
-
     .footer {
-      text-align: center;
       margin-top: 30px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #6988a3;
     }
   </style>
 </head>
 <body>
-  <div class="hub">
-    <div class="header">
-      <div class="badge teacher">👨‍🏫 Teacher Alex</div>
+  <div class="app-container">
+
+    <div class="badge-row">
+      <div class="badge teacher">👨‍🏫 Tr. Allex</div>
       <div class="badge">📘 IGCSE Physics · Pearson Edexcel</div>
     </div>
 
-    <h1>📚 Homework Hub</h1>
-    <p class="subtitle">Pick your topic and homework below. Your first-attempt score is sent to the teacher automatically.</p>
+    <h1>Bahlool British International School</h1>
+    <h2>Tr. Allex · Physics Homework</h2>
+    <p class="subtitle">IGCSE · Pearson Edexcel</p>
 
-    <!-- ================================================================= -->
-    <!--                          🌊 WAVES                                 -->
-    <!-- ================================================================= -->
-    <div class="topic">
-      <div class="topic-header">
-        <span class="topic-icon">🌊</span>
-        <div>
-          <div class="topic-title">Waves</div>
-          <div class="topic-desc">Frequency · Wavelength · Amplitude · Types of waves · Wave equation</div>
-        </div>
-      </div>
-      <div class="hw-list">
+    <p class="pick">📚 Choose your class to continue</p>
 
-        <a class="hw-link" href="waves-01.html">
-          <span class="num">01</span>
-          <span class="label">Waves HW1<small>Intro · frequency · types of waves</small></span>
-        </a>
+    <div class="class-grid">
+      <a class="class-card" href="yr9/">
+        <span class="class-icon">🎓</span>
+        <span class="class-name">Year 9</span>
+        <span class="class-desc">Physics Homework</span>
+      </a>
 
-        <a class="hw-link" href="waves-02.html">
-          <span class="num">02</span>
-          <span class="label">Waves HW2<small>Wavelength · amplitude · wave equation</small></span>
-        </a>
-
-        <!-- 👇 COPY THE BLOCK BELOW FOR EACH NEW WAVES HOMEWORK 👇
-
-        <a class="hw-link" href="waves-03.html">
-          <span class="num">03</span>
-          <span class="label">Waves HW3<small>Short description</small></span>
-        </a>
-
-        -->
-
-      </div>
-    </div>
-
-    <!-- ================================================================= -->
-    <!--              💧 SOLIDS, LIQUIDS & GASES — PART 2                 -->
-    <!-- ================================================================= -->
-    <div class="topic">
-      <div class="topic-header">
-        <span class="topic-icon">💧</span>
-        <div>
-          <div class="topic-title">Solids, Liquids &amp; Gases — Part 2</div>
-          <div class="topic-desc">Density · Pressure · Gas laws · Kinetic theory</div>
-        </div>
-      </div>
-      <div class="hw-list">
-
-        <!-- 👇 Ready when you upload the first file — replace href & description 👇
-
-        <a class="hw-link" href="slg2-01.html">
-          <span class="num">01</span>
-          <span class="label">SLG2 HW1<small>Density & pressure</small></span>
-        </a>
-
-        -->
-
-        <a class="hw-link disabled" href="#">
-          <span class="num">—</span>
-          <span class="label">Not yet available<small>Teacher will announce</small></span>
-        </a>
-
-      </div>
-    </div>
-
-    <!-- ================================================================= -->
-    <!--                        ☢️ RADIOACTIVITY                          -->
-    <!-- ================================================================= -->
-    <div class="topic">
-      <div class="topic-header">
-        <span class="topic-icon">☢️</span>
-        <div>
-          <div class="topic-title">Radioactivity</div>
-          <div class="topic-desc">Atomic structure · Alpha, beta, gamma · Half-life · Uses</div>
-        </div>
-      </div>
-      <div class="hw-list">
-
-        <!-- 👇 Ready when you upload the first file 👇
-
-        <a class="hw-link" href="radio-01.html">
-          <span class="num">01</span>
-          <span class="label">Radioactivity HW1<small>Atomic structure & types of radiation</small></span>
-        </a>
-
-        -->
-
-        <a class="hw-link disabled" href="#">
-          <span class="num">—</span>
-          <span class="label">Not yet available<small>Teacher will announce</small></span>
-        </a>
-
-      </div>
-    </div>
-
-    <!-- ================================================================= -->
-    <!--                        🌌 ASTROPHYSICS                           -->
-    <!-- ================================================================= -->
-    <div class="topic">
-      <div class="topic-header">
-        <span class="topic-icon">🌌</span>
-        <div>
-          <div class="topic-title">Astrophysics</div>
-          <div class="topic-desc">Solar system · Stars · Life cycle of stars · Red-shift · Big Bang</div>
-        </div>
-      </div>
-      <div class="hw-list">
-
-        <!-- 👇 Ready when you upload the first file 👇
-
-        <a class="hw-link" href="astro-01.html">
-          <span class="num">01</span>
-          <span class="label">Astrophysics HW1<small>Solar system & star life cycle</small></span>
-        </a>
-
-        -->
-
-        <a class="hw-link disabled" href="#">
-          <span class="num">—</span>
-          <span class="label">Not yet available<small>Teacher will announce</small></span>
-        </a>
-
-      </div>
+      <a class="class-card" href="yr10/">
+        <span class="class-icon">🎓</span>
+        <span class="class-name">Year 10</span>
+        <span class="class-desc">Physics Homework</span>
+      </a>
     </div>
 
     <div class="footer">
-      © Teacher Alex · IGCSE Physics · Pearson Edexcel
+      © Tr. Allex · Bahlool British International School
     </div>
   </div>
 </body>
