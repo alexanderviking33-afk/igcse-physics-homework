@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forces & Motion HW1 · Tr. Alex · Bahlool British International School</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(145deg, #f5f9ff 0%, #dae5f0 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .app-container {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-radius: 48px;
+      box-shadow: 0 30px 50px rgba(0, 20, 40, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
+      padding: 32px 30px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .badge {
+      background: #1e3c72;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .teacher { background: #2b5876; }
+    .score-board {
+      background: #ffffffd9;
+      border-radius: 40px;
+      padding: 8px 22px;
+      font-weight: 600;
+      color: #0b2b4a;
+      border: 1px solid #b7d0e5;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+      font-size: 1.1rem;
+    }
+    .score-board span {
+      color: #1e6f9f;
+      font-size: 1.4rem;
+      margin-left: 8px;
+    }
+    .cover, .quiz, .result { transition: opacity 0.3s ease; }
+    .cover { text-align: center; padding: 20px 10px; }
+    .cover h2 { font-size: 2rem; color: #0b2b4a; margin-bottom: 10px; }
+    .cover h3 { font-size: 1.2rem; font-weight: 400; color: #2c5778; margin-bottom: 28px; }
+    .cover input {
+      width: 80%;
+      max-width: 350px;
+      padding: 16px 22px;
+      border-radius: 60px;
+      border: 1px solid #b7d0e5;
+      background: white;
+      font-size: 1.1rem;
+      outline: none;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02), 0 6px 12px rgba(0,0,0,0.05);
+      margin-bottom: 25px;
+      transition: 0.2s;
+      text-align: center;
+    }
+    .cover input:focus {
+      border-color: #1e6f9f;
+      box-shadow: 0 0 0 4px rgba(30,111,159,0.15);
+    }
+    .btn {
+      background: #1e3c72;
+      color: white;
+      border: none;
+      padding: 14px 38px;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 12px 18px -6px rgba(20, 50, 90, 0.4);
+      transition: 0.15s;
+      border: 1px solid #ffffff50;
+    }
+    .btn:hover { background: #0f2b4f; transform: scale(1.02); }
+    .btn:active { transform: scale(0.98); }
+    .btn.secondary {
+      background: #ffffff;
+      color: #1e3c72;
+      border: 1.5px solid #1e3c72;
+      box-shadow: 0 8px 14px -8px rgba(0,0,0,0.2);
+    }
+    .btn.secondary:hover { background: #e9f0f9; }
+    .quiz { display: none; }
+    .question-text {
+      font-size: 1.4rem;
+      font-weight: 500;
+      line-height: 1.5;
+      margin: 25px 0 20px 0;
+      color: #0b2b4a;
+      padding: 0 6px;
+    }
+    .diagram-box {
+      background: #eef6ff;
+      border: 1.5px dashed #6f9fcf;
+      border-radius: 22px;
+      padding: 16px 18px;
+      margin: 0 6px 20px 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: #0b2b4a;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .diagram-box .caption {
+      display: block;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 0.8rem;
+      color: #5b7c99;
+      margin-top: 10px;
+      font-style: italic;
+      white-space: normal;
+    }
+    .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .option {
+      background: white;
+      border: 1.5px solid #d0e0ee;
+      border-radius: 60px;
+      padding: 16px 24px;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #103450;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      text-align: left;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .option:hover:not(.disabled-option) {
+      background: #e6f0fc;
+      border-color: #6f9fcf;
+      transform: translateX(6px);
+    }
+    .option.selected { background: #d2e6ff; border-color: #1e6f9f; box-shadow: 0 0 0 2px #1e6f9f40; }
+    .option.correct-highlight { background: #c8f0d1; border-color: #2e7d5e; }
+    .option.wrong-highlight { background: #ffe0e0; border-color: #c0392b; }
+    .option.disabled-option { cursor: default; opacity: 0.9; }
+    .option .letter {
+      background: #ffffffc0;
+      width: 32px; height: 32px;
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      border-radius: 50%;
+      font-weight: 700;
+      color: #1e3c72;
+      border: 1px solid #b7d0e5;
+      flex-shrink: 0;
+    }
+    .feedback {
+      background: #f0f7ff;
+      border-radius: 28px;
+      padding: 16px 24px;
+      margin-top: 6px;
+      border-left: 6px solid #1e6f9f;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    .feedback strong { color: #0b2b4a; }
+    .nav-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+    }
+    .result { display: none; text-align: center; padding: 20px 0; }
+    .result h2 { font-size: 2rem; color: #0b2b4a; margin-bottom: 16px; }
+    .final-score {
+      font-size: 4rem;
+      font-weight: 700;
+      color: #1e6f9f;
+      line-height: 1;
+      margin: 16px 0;
+    }
+    .review-list {
+      text-align: left;
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 24px 0;
+      padding-right: 6px;
+    }
+    .review-item {
+      background: #fff;
+      border-radius: 20px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      border-left: 6px solid #c0392b;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .review-item p { margin: 6px 0; }
+    .small-meta { font-size: 0.85rem; color: #5b7c99; margin-top: 8px; }
+    .hidden { display: none !important; }
+    .footer-note { font-size: 0.8rem; color: #6988a3; text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <div class="header">
+    <div class="badge teacher">👨‍🏫 Tr. Alex · Bahlool British International School</div>
+    <div class="badge">📘 Pearson Edexcel · Forces &amp; Motion</div>
+    <div class="score-board" id="scoreDisplay">Score <span id="scoreValue">0</span></div>
+  </div>
+
+  <div id="coverSection" class="cover">
+    <h2>🏋️ Forces &amp; Motion Homework</h2>
+    <h3>Year 9 · IGCSE Physics · Pearson Edexcel</h3>
+    <p style="margin-bottom: 28px; color: #2c5778;">Enter your full name to begin</p>
+    <input type="text" id="studentName" placeholder="e.g. Jamie Chen" autocomplete="off">
+    <br>
+    <button class="btn" id="startBtn">Start Quiz →</button>
+    <div class="footer-note">25 questions · one attempt · score updates live</div>
+  </div>
+
+  <div id="quizSection" class="quiz">
+    <div class="question-text" id="questionText">Loading…</div>
+    <div id="diagramContainer"></div>
+    <div class="options" id="optionsContainer"></div>
+    <div id="feedbackContainer" class="feedback hidden"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" id="prevBtn" disabled>← Previous</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <div id="resultSection" class="result">
+    <h2>📋 Quiz Complete</h2>
+    <div class="final-score" id="finalScore">0/25</div>
+    <p style="color: #2c5778; margin-bottom: 12px;">Here are your incorrect answers (with explanations):</p>
+    <div class="review-list" id="reviewList"></div>
+    <button class="btn" id="restartBtn">Try again (new attempt)</button>
+  </div>
+</div>
+
+<script>
+  // ========== GOOGLE SHEETS SETTINGS ==========
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5-uedUZMkZMtjVECaYhmjjPQWdw0D72tYeEFIBx2Qk9yKWv_5laJSOVl756axwZ3m/exec';
+  const HOMEWORK_ID = 'Y9 · Forces & Motion HW1';
+  // =============================================
+
+  const questions = [
+    {
+      question: "Which of the following is a scalar quantity?",
+      options: ["Velocity", "Force", "Speed", "Acceleration"],
+      correct: 2,
+      explanation: "Speed has magnitude only — no direction — so it is a scalar. Velocity, force and acceleration are all vectors because they need a direction."
+    },
+    {
+      question: "Which of the following is a vector quantity?",
+      options: ["Mass", "Time", "Distance", "Displacement"],
+      correct: 3,
+      explanation: "Displacement is distance in a given direction, so it is a vector. Mass, time and distance are all scalars."
+    },
+    {
+      question: "Which of these is a NON-CONTACT force?",
+      options: ["Friction", "Air resistance", "Gravity", "Tension"],
+      correct: 2,
+      explanation: "Gravity acts at a distance without touching the object — it is a non-contact force. Friction, air resistance and tension all require contact."
+    },
+    {
+      question: "Which of these is a CONTACT force?",
+      options: ["Magnetic force", "Electrostatic force", "Normal force (reaction)", "Gravitational force"],
+      correct: 2,
+      explanation: "The normal (reaction) force acts when two surfaces touch — it is a contact force. Magnetic, electrostatic and gravitational forces act at a distance."
+    },
+    {
+      question: "Look at the force diagram below. In which direction is the object being pulled?",
+      diagram: "◀── 12 N         Object         ──▶ 8 N",
+      options: ["Left, with a resultant force of 12 N", "Right, with a resultant force of 8 N", "Left, with a resultant force of 4 N", "The forces are balanced"],
+      correct: 2,
+      explanation: "The forces are in opposite directions, so subtract: 12 N − 8 N = 4 N. The larger force (12 N) points left, so the resultant is 4 N to the left."
+    },
+    {
+      question: "What is the name of the force that pulls all objects toward the centre of the Earth?",
+      options: ["Magnetic force", "Weight (gravity)", "Friction", "Upthrust"],
+      correct: 1,
+      explanation: "Weight is the force of gravity acting on an object. On Earth, it pulls objects toward the centre of the planet."
+    },
+    {
+      question: "Which statement about mass and weight is correct?",
+      options: [
+        "Mass changes with location; weight stays the same",
+        "Mass and weight both change with location",
+        "Mass stays the same everywhere; weight changes with gravitational field strength",
+        "Mass and weight are the same thing"
+      ],
+      correct: 2,
+      explanation: "Mass is the amount of matter and never changes. Weight is a force (W = mg) and depends on the gravitational field strength of the planet."
+    },
+    {
+      question: "What are the correct units for mass and weight?",
+      options: ["Mass in newtons (N), weight in kilograms (kg)", "Mass in kilograms (kg), weight in newtons (N)", "Both in kilograms (kg)", "Both in newtons (N)"],
+      correct: 1,
+      explanation: "Mass is measured in kilograms (kg). Weight is a force, so it is measured in newtons (N)."
+    },
+    {
+      question: "An astronaut travels from Earth to the Moon. Which of these stays the same?",
+      options: ["Weight", "Mass", "Gravitational field strength", "Downward force on the astronaut"],
+      correct: 1,
+      explanation: "Mass is the amount of matter and is the same everywhere in the universe. Weight changes because gravitational field strength changes."
+    },
+    {
+      question: "The gravitational field strength on the Moon is 1.6 N/kg. What is the weight of a 60 kg astronaut on the Moon?",
+      options: ["60 N", "96 N", "588 N", "1.6 N"],
+      correct: 1,
+      explanation: "Weight = mass × g = 60 × 1.6 = 96 N."
+    },
+    {
+      question: "The gravitational field strength on Mars is 3.7 N/kg. What is the weight of a 50 kg object on Mars?",
+      options: ["50 N", "135 N", "185 N", "490 N"],
+      correct: 2,
+      explanation: "Weight = m × g = 50 × 3.7 = 185 N."
+    },
+    {
+      question: "The gravitational field strength on Jupiter is 24.8 N/kg. What is the weight of a 70 kg astronaut on Jupiter?",
+      options: ["70 N", "1,736 N", "686 N", "248 N"],
+      correct: 1,
+      explanation: "W = m × g = 70 × 24.8 = 1736 N. Jupiter's gravity is much stronger, so the astronaut feels much heavier."
+    },
+    {
+      question: "On Earth, gravitational field strength is 9.8 N/kg. What is the weight of a 25 kg suitcase?",
+      options: ["2.55 N", "25 N", "245 N", "0.39 N"],
+      correct: 2,
+      explanation: "W = m × g = 25 × 9.8 = 245 N."
+    },
+    {
+      question: "An object has a weight of 300 N on Earth (g = 9.8 N/kg). What is its mass?",
+      options: ["30.6 kg", "300 kg", "2940 kg", "0.033 kg"],
+      correct: 0,
+      explanation: "Rearranging W = mg gives m = W/g = 300 / 9.8 ≈ 30.6 kg."
+    },
+    {
+      question: "A skydiver is falling but her parachute has opened, and she is now moving at a steady speed. Which force diagram best describes her motion?",
+      diagram: "    ↑ Air resistance (500 N)\n    |\n  🪂  Skydiver\n    |\n    ↓ Weight (500 N)",
+      options: ["Forces are unbalanced, so she accelerates", "Forces are balanced, so she moves at constant speed", "Forces are balanced, so she is stationary", "Only weight acts on her"],
+      correct: 1,
+      explanation: "At terminal velocity, air resistance equals weight. Balanced forces means no acceleration — she continues at a steady speed."
+    },
+    {
+      question: "A book is resting on a table. Which of the following correctly describes the forces on the book?",
+      diagram: "         ↑ Normal force (reaction)\n         |\n     📕  Book\n         |\n         ↓ Weight",
+      options: ["Only weight acts on the book", "The normal force is greater than weight", "Normal force equals weight — balanced forces", "The book is accelerating upward"],
+      correct: 2,
+      explanation: "The book is stationary, so forces must be balanced. The upward normal force equals the downward weight."
+    },
+    {
+      question: "Two forces act on an object in the SAME direction: 15 N to the right and 20 N to the right. What is the resultant force?",
+      options: ["5 N to the right", "35 N to the right", "35 N to the left", "300 N to the right"],
+      correct: 1,
+      explanation: "Forces in the same direction add: 15 + 20 = 35 N, in the direction they both point (right)."
+    },
+    {
+      question: "Two forces act on an object in OPPOSITE directions: 40 N to the right and 25 N to the left. What is the resultant force?",
+      options: ["65 N to the right", "65 N to the left", "15 N to the right", "15 N to the left"],
+      correct: 2,
+      explanation: "Opposite forces subtract: 40 − 25 = 15 N. The larger force (40 N) points right, so resultant is 15 N to the right."
+    },
+    {
+      question: "If the forces on an object are balanced, what happens to its motion?",
+      options: [
+        "It accelerates in the direction of the larger force",
+        "It stays stationary or keeps moving at constant velocity",
+        "It slows down and stops",
+        "It always stays stationary"
+      ],
+      correct: 1,
+      explanation: "Balanced forces → zero resultant force → no acceleration. The object either stays at rest, or continues at a constant speed in a straight line."
+    },
+    {
+      question: "An object has unbalanced forces acting on it. What happens?",
+      options: ["It remains stationary", "It moves at constant speed", "It accelerates in the direction of the resultant force", "Its mass changes"],
+      correct: 2,
+      explanation: "An unbalanced (resultant) force causes acceleration in the direction of the resultant force. Newton's second law."
+    },
+    {
+      question: "Look at the diagram. Are the forces balanced?",
+      diagram: "◀── 30 N      Object      ──▶ 30 N",
+      options: ["No — unbalanced, so it accelerates", "Yes — balanced, so it stays at constant velocity or rest", "Only the right force counts", "Cannot be determined"],
+      correct: 1,
+      explanation: "The two forces are equal in size but opposite in direction, so they cancel. Resultant = 0 N → balanced → no acceleration."
+    },
+    {
+      question: "Look at the force diagram. What is the resultant force (vertical direction)?",
+      diagram: "        ↑ Lift (10,000 N)\n        |\n      ✈️ Plane\n        |\n        ↓ Weight (9,000 N)",
+      options: ["19,000 N upward", "1,000 N downward", "1,000 N upward", "Zero"],
+      correct: 2,
+      explanation: "Upward 10,000 N − downward 9,000 N = 1,000 N. The larger force is upward, so the resultant is 1,000 N upward."
+    },
+    {
+      question: "Sara is 40 kg on Earth. She travels to the Moon where g = 1.6 N/kg. Which is TRUE about her on the Moon?",
+      options: [
+        "Her mass is 40 kg, her weight is 64 N",
+        "Her mass is 64 kg, her weight is 40 N",
+        "Her mass is 6.4 kg, her weight is 40 N",
+        "Her mass and weight are both the same as on Earth"
+      ],
+      correct: 0,
+      explanation: "Mass is unchanged at 40 kg. Weight = m × g = 40 × 1.6 = 64 N on the Moon."
+    },
+    {
+      question: "A person weighs 800 N on Earth. On a planet where g is half that of Earth, what will they weigh?",
+      options: ["800 N", "1,600 N", "400 N", "160 N"],
+      correct: 2,
+      explanation: "Weight is proportional to g. If g halves, weight halves: 800 N → 400 N. (Their mass is unchanged.)"
+    },
+    {
+      question: "A car is being driven forward with a driving force of 2,000 N. Friction and air resistance total 700 N acting backwards. What is the resultant force?",
+      options: ["2,700 N forward", "1,300 N forward", "1,300 N backward", "700 N forward"],
+      correct: 1,
+      explanation: "Forward 2,000 N − backward 700 N = 1,300 N. The larger force points forward, so resultant is 1,300 N forward — the car accelerates."
+    }
+  ];
+
+  let currentIndex = 0;
+  let userAnswers = new Array(questions.length).fill(null);
+  let score = 0;
+  let quizFinished = false;
+  let studentName = "";
+  let submittedToSheet = false;
+
+  const coverSection = document.getElementById('coverSection');
+  const quizSection = document.getElementById('quizSection');
+  const resultSection = document.getElementById('resultSection');
+  const studentNameInput = document.getElementById('studentName');
+  const startBtn = document.getElementById('startBtn');
+  const questionText = document.getElementById('questionText');
+  const diagramContainer = document.getElementById('diagramContainer');
+  const optionsContainer = document.getElementById('optionsContainer');
+  const feedbackContainer = document.getElementById('feedbackContainer');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const scoreValue = document.getElementById('scoreValue');
+  const finalScore = document.getElementById('finalScore');
+  const reviewList = document.getElementById('reviewList');
+  const restartBtn = document.getElementById('restartBtn');
+
+  function updateScoreDisplay() { scoreValue.textContent = score; }
+
+  function renderQuestion(index) {
+    const q = questions[index];
+    questionText.textContent = `${index+1}. ${q.question}`;
+
+    diagramContainer.innerHTML = '';
+    if (q.diagram) {
+      const box = document.createElement('div');
+      box.className = 'diagram-box';
+      box.textContent = q.diagram;
+      const cap = document.createElement('span');
+      cap.className = 'caption';
+      cap.textContent = 'Force diagram — not to scale';
+      box.appendChild(cap);
+      diagramContainer.appendChild(box);
+    }
+
+    optionsContainer.innerHTML = '';
+    feedbackContainer.classList.add('hidden');
+    feedbackContainer.innerHTML = '';
+
+    q.options.forEach((opt, optIndex) => {
+      const btn = document.createElement('div');
+      btn.classList.add('option');
+      btn.dataset.optIndex = optIndex;
+      const letter = String.fromCharCode(65 + optIndex);
+      btn.innerHTML = `<span class="letter">${letter}</span> ${opt}`;
+      if (userAnswers[index] === optIndex) btn.classList.add('selected');
+      btn.addEventListener('click', () => onOptionClick(index, optIndex));
+      optionsContainer.appendChild(btn);
+    });
+
+    const answered = userAnswers[index] !== null;
+    if (answered) {
+      showFeedbackForCurrent(index);
+      document.querySelectorAll('.option').forEach(o => o.classList.add('disabled-option'));
+    } else {
+      document.querySelectorAll('.option').forEach(o => o.classList.remove('disabled-option'));
+    }
+
+    prevBtn.disabled = (index === 0);
+    nextBtn.textContent = (index === questions.length - 1) ? 'Finish' : 'Next →';
+  }
+
+  function showFeedbackForCurrent(index) {
+    const q = questions[index];
+    const selected = userAnswers[index];
+    if (selected === null) return;
+    const isCorrect = (selected === q.correct);
+    document.querySelectorAll('.option').forEach((opt, i) => {
+      opt.classList.remove('correct-highlight', 'wrong-highlight');
+      if (i === q.correct) opt.classList.add('correct-highlight');
+      else if (i === selected && i !== q.correct) opt.classList.add('wrong-highlight');
+    });
+    feedbackContainer.classList.remove('hidden');
+    const correctLetter = String.fromCharCode(65 + q.correct);
+    const correctText = q.options[q.correct];
+    if (isCorrect) {
+      feedbackContainer.innerHTML = `<strong>✅ Correct!</strong> ${q.explanation}`;
+    } else {
+      feedbackContainer.innerHTML = `<strong>❌ Incorrect.</strong> The correct answer is <strong>${correctLetter}: ${correctText}</strong>.<br><span style="display:block; margin-top:8px;">📘 ${q.explanation}</span>`;
+    }
+  }
+
+  function onOptionClick(qIndex, optIndex) {
+    if (userAnswers[qIndex] !== null) return;
+    userAnswers[qIndex] = optIndex;
+    if (optIndex === questions[qIndex].correct) score++;
+    updateScoreDisplay();
+
+    const q = questions[qIndex];
+    document.querySelectorAll('.option').forEach((opt, i) => {
+      opt.classList.remove('selected', 'correct-highlight', 'wrong-highlight');
+      if (i === optIndex) opt.classList.add('selected');
+      if (i === q.correct) opt.classList.add('correct-highlight');
+      if (i === optIndex && i !== q.correct) opt.classList.add('wrong-highlight');
+      opt.classList.add('disabled-option');
+    });
+
+    feedbackContainer.classList.remove('hidden');
+    const correctLetter = String.fromCharCode(65 + q.correct);
+    const correctText = q.options[q.correct];
+    if (optIndex === q.correct) {
+      feedbackContainer.innerHTML = `<strong>✅ Correct!</strong> ${q.explanation}`;
+    } else {
+      feedbackContainer.innerHTML = `<strong>❌ Incorrect.</strong> The correct answer is <strong>${correctLetter}: ${correctText}</strong>.<br><span style="display:block; margin-top:8px;">📘 ${q.explanation}</span>`;
+    }
+  }
+
+  function goToNext() {
+    if (currentIndex < questions.length - 1) {
+      currentIndex++; renderQuestion(currentIndex);
+    } else { finishQuiz(); }
+  }
+  function goToPrev() {
+    if (currentIndex > 0) { currentIndex--; renderQuestion(currentIndex); }
+  }
+
+  function finishQuiz() {
+    quizFinished = true;
+    quizSection.style.display = 'none';
+    resultSection.style.display = 'block';
+    finalScore.textContent = `${score}/${questions.length}`;
+
+    reviewList.innerHTML = '';
+    let incorrectCount = 0;
+    questions.forEach((q, idx) => {
+      const selected = userAnswers[idx];
+      if (selected !== null && selected !== q.correct) {
+        incorrectCount++;
+        const div = document.createElement('div');
+        div.classList.add('review-item');
+        const sL = String.fromCharCode(65 + selected);
+        const cL = String.fromCharCode(65 + q.correct);
+        div.innerHTML = `
+          <p><strong>Q${idx+1}: ${q.question}</strong></p>
+          <p>❌ Your answer: ${sL}) ${q.options[selected]}</p>
+          <p>✅ Correct: ${cL}) ${q.options[q.correct]}</p>
+          <p class="small-meta">📘 ${q.explanation}</p>
+        `;
+        reviewList.appendChild(div);
+      }
+    });
+    if (incorrectCount === 0) {
+      reviewList.innerHTML = '<p style="text-align:center; padding:20px;">🎉 Perfect! You got all answers correct!</p>';
+    }
+
+    if (!submittedToSheet) {
+      submitToSheet(studentName, score, questions.length);
+      submittedToSheet = true;
+    }
+  }
+
+  function submitToSheet(name, scoreVal, total) {
+    if (!SCRIPT_URL || SCRIPT_URL.includes('···')) {
+      console.warn('Google Sheets URL not set. Score not sent.');
+      return;
+    }
+    const payload = {
+      homework: HOMEWORK_ID,
+      name: name,
+      score: scoreVal,
+      total: total,
+      firstAttempt: true
+    };
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => console.log('Score sent to Google Sheets'))
+    .catch(err => console.error('Error sending to sheet:', err));
+  }
+
+  function startQuiz() {
+    const name = studentNameInput.value.trim();
+    if (!name) { alert('Please enter your name before starting.'); return; }
+    studentName = name;
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false;
+    coverSection.style.display = 'none';
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    renderQuestion(0);
+  }
+
+  function restartQuiz() {
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false;
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    coverSection.style.display = 'none';
+    renderQuestion(0);
+  }
+
+  startBtn.addEventListener('click', startQuiz);
+  studentNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') startQuiz(); });
+  prevBtn.addEventListener('click', goToPrev);
+  nextBtn.addEventListener('click', goToNext);
+  restartBtn.addEventListener('click', restartQuiz);
+
+  quizSection.style.display = 'none';
+  resultSection.style.display = 'none';
+  updateScoreDisplay();
+</script>
+</body>
+</html>
