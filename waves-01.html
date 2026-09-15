@@ -268,35 +268,6 @@
       color: #5b7c99;
       margin-top: 8px;
     }
-    .highlight-code {
-      background: #0b2b4a;
-      color: #d4edff;
-      padding: 12px 20px;
-      border-radius: 30px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.85rem;
-      word-break: break-all;
-      margin: 20px 0 10px;
-      border: 1px solid #5f8db0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .highlight-code span {
-      background: #ffd966;
-      color: #0b2b4a;
-      padding: 4px 12px;
-      border-radius: 40px;
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
-    .footer-note {
-      font-size: 0.8rem;
-      color: #6988a3;
-      text-align: center;
-      margin-top: 10px;
-    }
     .hidden {
       display: none !important;
     }
@@ -311,15 +282,6 @@
     <div class="score-board" id="scoreDisplay">Score <span id="scoreValue">0</span></div>
   </div>
 
-  <!-- GOOGLE SHEETS PLACEHOLDER (HIGHLIGHTED) -->
-  <div class="highlight-code">
-    <span>📌 PASTE GOOGLE APPS SCRIPT URL BELOW (inside submitToSheet function)</span>
-    <code style="color:#b7e0ff;">const SCRIPT_URL = 'https://script.google.com/macros/s/···/exec';</code>
-  </div>
-  <div style="font-size:0.85rem; margin-bottom:20px; color:#2c5778; background:#fff6d9; padding:8px 18px; border-radius:40px;">
-    ⚠️ Replace the placeholder URL inside the function <strong>submitToSheet()</strong> — only first attempt score is sent.
-  </div>
-
   <!-- COVER SECTION -->
   <div id="coverSection" class="cover">
     <h2>🌊 Waves Homework</h2>
@@ -328,7 +290,7 @@
     <input type="text" id="studentName" placeholder="e.g. Jamie Chen" autocomplete="off">
     <br>
     <button class="btn" id="startBtn">Start Quiz →</button>
-    <div class="footer-note">25 questions · one attempt · score updates live</div>
+    <div class="footer-note" style="font-size:0.8rem; color:#6988a3; margin-top:10px;">25 questions · one attempt · score updates live</div>
   </div>
 
   <!-- QUIZ SECTION (one question at a time) -->
@@ -354,11 +316,8 @@
 
 <script>
   // ========== PASTE YOUR GOOGLE SHEETS URL HERE ==========
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5-uedUZMkZMtjVECaYhmjjPQWdw0D72tYeEFIBx2Qk9yKWv_5laJSOVl756axwZ3m/exec'; 
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5-uedUZMkZMtjVECaYhmjjPQWdw0D72tYeEFIBx2Qk9yKWv_5laJSOVl756axwZ3m/exec';
   const HOMEWORK_ID = 'Waves HW1';
-
-
- // <-- REPLACE WITH YOUR URL
   // =======================================================
 
   // ---------- 25 PEARSON EDEXCEL STYLE WAVES QUESTIONS ----------
@@ -442,7 +401,7 @@
       explanation: "Period (T) is the time taken for one complete wave cycle, measured in seconds."
     },
     {
-      question: "If a wave’s frequency doubles while speed stays constant, what happens to wavelength?",
+      question: "If a wave's frequency doubles while speed stays constant, what happens to wavelength?",
       options: ["Doubles", "Halves", "Stays same", "Quadruples"],
       correct: 1,
       explanation: "v = f λ. If v constant and f doubles, λ must halve (inverse relationship)."
@@ -517,11 +476,11 @@
 
   // ---------- STATE ----------
   let currentIndex = 0;
-  let userAnswers = new Array(questions.length).fill(null); // stores selected option index (0-3) or null
+  let userAnswers = new Array(questions.length).fill(null);
   let score = 0;
   let quizFinished = false;
   let studentName = "";
-  let submittedToSheet = false; // only submit once (first attempt)
+  let submittedToSheet = false;
 
   // DOM elements
   const coverSection = document.getElementById('coverSection');
@@ -552,12 +511,11 @@
     feedbackContainer.classList.add('hidden');
     feedbackContainer.innerHTML = '';
 
-    // Build options
     q.options.forEach((opt, optIndex) => {
       const btn = document.createElement('div');
       btn.classList.add('option');
       btn.dataset.optIndex = optIndex;
-      const letter = String.fromCharCode(65 + optIndex); // A,B,C,D
+      const letter = String.fromCharCode(65 + optIndex);
       btn.innerHTML = `<span class="letter">${letter}</span> ${opt}`;
 
       if (userAnswers[index] === optIndex) {
@@ -568,45 +526,29 @@
       optionsContainer.appendChild(btn);
     });
 
-    // Show feedback if already answered (and not in finished review mode? we handle)
     const answered = userAnswers[index] !== null;
     if (answered) {
       showFeedbackForCurrent(index);
-    } else {
-      // remove any highlight classes and keep disabled? no, options clickable
-      enableOptions(true);
-    }
-
-    // If already answered, we still allow review but disable selection (because one attempt)
-    if (answered) {
-      // disable further clicks
       document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled-option'));
-      // show feedback
-      showFeedbackForCurrent(index);
     } else {
       document.querySelectorAll('.option').forEach(opt => opt.classList.remove('disabled-option'));
     }
 
-    // Manage navigation buttons
     prevBtn.disabled = (index === 0);
-    // next button changes text if last question
     if (index === questions.length - 1) {
       nextBtn.textContent = 'Finish';
     } else {
       nextBtn.textContent = 'Next →';
     }
-
-    // If quiz already finished (should not happen in normal flow) but safe
   }
 
-  // Show feedback for the current question based on userAnswers
+  // ---------- SHOW FEEDBACK ----------
   function showFeedbackForCurrent(index) {
     const q = questions[index];
     const selected = userAnswers[index];
     if (selected === null) return;
 
     const isCorrect = (selected === q.correct);
-    // Highlight correct and wrong options
     const allOptions = document.querySelectorAll('.option');
     allOptions.forEach((opt, i) => {
       opt.classList.remove('correct-highlight', 'wrong-highlight');
@@ -617,40 +559,28 @@
       }
     });
 
-    // Show explanation feedback
     feedbackContainer.classList.remove('hidden');
     const correctLetter = String.fromCharCode(65 + q.correct);
     const correctText = q.options[q.correct];
     if (isCorrect) {
       feedbackContainer.innerHTML = `<strong>✅ Correct!</strong> ${q.explanation}`;
     } else {
-      const selectedLetter = String.fromCharCode(65 + selected);
       feedbackContainer.innerHTML = `<strong>❌ Incorrect.</strong> The correct answer is <strong>${correctLetter}: ${correctText}</strong>.<br><span style="display:block; margin-top:8px;">📘 ${q.explanation}</span>`;
     }
   }
 
-  // Enable or disable options clicks
-  function enableOptions(enable) {
-    // not used globally, but we manage per question
-  }
-
   // ---------- OPTION CLICK HANDLER ----------
   function onOptionClick(qIndex, optIndex) {
-    // if already answered, ignore
     if (userAnswers[qIndex] !== null) return;
 
-    // record answer (first attempt)
     userAnswers[qIndex] = optIndex;
 
-    // check correctness and update score
     const isCorrect = (optIndex === questions[qIndex].correct);
     if (isCorrect) {
       score++;
     }
     updateScoreDisplay();
 
-    // re-render to show highlights and feedback (but we need to keep event listeners from re-rendering)
-    // Instead of full re-render, just update visuals and disable options.
     const q = questions[qIndex];
     const allOptions = document.querySelectorAll('.option');
     allOptions.forEach((opt, i) => {
@@ -661,18 +591,14 @@
       opt.classList.add('disabled-option');
     });
 
-    // show feedback
     feedbackContainer.classList.remove('hidden');
     const correctLetter = String.fromCharCode(65 + q.correct);
     const correctText = q.options[q.correct];
     if (isCorrect) {
       feedbackContainer.innerHTML = `<strong>✅ Correct!</strong> ${q.explanation}`;
     } else {
-      const selectedLetter = String.fromCharCode(65 + optIndex);
       feedbackContainer.innerHTML = `<strong>❌ Incorrect.</strong> The correct answer is <strong>${correctLetter}: ${correctText}</strong>.<br><span style="display:block; margin-top:8px;">📘 ${q.explanation}</span>`;
     }
-
-    // No further clicks on this question
   }
 
   // ---------- NAVIGATION ----------
@@ -681,7 +607,6 @@
       currentIndex++;
       renderQuestion(currentIndex);
     } else {
-      // finish button pressed
       finishQuiz();
     }
   }
@@ -699,10 +624,8 @@
     quizSection.style.display = 'none';
     resultSection.style.display = 'block';
 
-    // compute final score (already tracked)
     finalScore.textContent = `${score}/${questions.length}`;
 
-    // Build review of incorrect answers
     reviewList.innerHTML = '';
     let incorrectCount = 0;
     questions.forEach((q, idx) => {
@@ -726,7 +649,6 @@
       reviewList.innerHTML = '<p style="text-align:center; padding:20px;">🎉 Perfect! You got all answers correct!</p>';
     }
 
-    // Submit to Google Sheets (only once, first attempt, only score)
     if (!submittedToSheet) {
       submitToSheet(studentName, score, questions.length);
       submittedToSheet = true;
@@ -735,24 +657,22 @@
 
   // ---------- GOOGLE SHEETS SUBMISSION ----------
   function submitToSheet(name, scoreVal, total) {
-    // Highlighted: paste your Google Apps Script URL in SCRIPT_URL variable (top of script)
     if (!SCRIPT_URL || SCRIPT_URL.includes('···')) {
       console.warn('Google Sheets URL not set. Score not sent.');
       return;
     }
 
-      const payload = {
-    homework: HOMEWORK_ID,
-    name: name,
-    score: scoreVal,
-    total: total,
-    firstAttempt: true
-  };
+    const payload = {
+      homework: HOMEWORK_ID,
+      name: name,
+      score: scoreVal,
+      total: total,
+      firstAttempt: true
     };
 
     fetch(SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors', // typical for Apps Script
+      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
@@ -769,7 +689,6 @@
     }
     studentName = name;
 
-    // reset state for fresh attempt
     currentIndex = 0;
     userAnswers = new Array(questions.length).fill(null);
     score = 0;
@@ -784,19 +703,17 @@
     renderQuestion(0);
   }
 
-  // ---------- RESTART (new attempt) ----------
+  // ---------- RESTART ----------
   function restartQuiz() {
-    // reset everything, but keep name
     currentIndex = 0;
     userAnswers = new Array(questions.length).fill(null);
     score = 0;
     updateScoreDisplay();
     quizFinished = false;
-    submittedToSheet = false; // allow new submission for new attempt (but only first attempt from this session gets sent? yes, new attempt new submission)
+    submittedToSheet = false;
     resultSection.style.display = 'none';
     quizSection.style.display = 'block';
     coverSection.style.display = 'none';
-    // do not clear student name
     renderQuestion(0);
   }
 
