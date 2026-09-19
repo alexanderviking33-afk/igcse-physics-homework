@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waves & EM Spectrum · Homework 2 · Tr. Alex · Bahlool British International School</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(145deg, #f5f9ff 0%, #dae5f0 100%);
+      min-height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      padding: 20px;
+    }
+    .app-container {
+      width: 100%; max-width: 900px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 48px;
+      box-shadow: 0 30px 50px rgba(0, 20, 40, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
+      padding: 32px 30px;
+    }
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    .badge {
+      background: #1e3c72; color: white;
+      padding: 6px 16px; border-radius: 40px;
+      font-size: 0.85rem; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .teacher { background: #2b5876; }
+    .score-board {
+      background: #ffffffd9; border-radius: 40px;
+      padding: 8px 22px; font-weight: 600; color: #0b2b4a;
+      border: 1px solid #b7d0e5;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+      font-size: 1.1rem;
+    }
+    .score-board span { color: #1e6f9f; font-size: 1.4rem; margin-left: 8px; }
+    .cover { text-align: center; padding: 20px 10px; }
+    .cover h2 { font-size: 2rem; color: #0b2b4a; margin-bottom: 10px; }
+    .cover h3 { font-size: 1.2rem; font-weight: 400; color: #2c5778; margin-bottom: 28px; }
+    .cover input {
+      width: 80%; max-width: 350px;
+      padding: 16px 22px; border-radius: 60px;
+      border: 1px solid #b7d0e5; background: white;
+      font-size: 1.1rem; outline: none;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02), 0 6px 12px rgba(0,0,0,0.05);
+      margin-bottom: 25px; transition: 0.2s; text-align: center;
+    }
+    .cover input:focus { border-color: #1e6f9f; box-shadow: 0 0 0 4px rgba(30,111,159,0.15); }
+    .btn {
+      background: #1e3c72; color: white; border: none;
+      padding: 14px 38px; border-radius: 60px;
+      font-size: 1.1rem; font-weight: 600; cursor: pointer;
+      box-shadow: 0 12px 18px -6px rgba(20, 50, 90, 0.4);
+      transition: 0.15s; border: 1px solid #ffffff50;
+    }
+    .btn:hover { background: #0f2b4f; transform: scale(1.02); }
+    .btn:active { transform: scale(0.98); }
+    .btn.secondary {
+      background: #ffffff; color: #1e3c72;
+      border: 1.5px solid #1e3c72;
+      box-shadow: 0 8px 14px -8px rgba(0,0,0,0.2);
+    }
+    .btn.secondary:hover { background: #e9f0f9; }
+    .quiz { display: none; }
+    .question-text {
+      font-size: 1.35rem; font-weight: 500; line-height: 1.5;
+      margin: 25px 0 18px 0; color: #0b2b4a; padding: 0 6px;
+    }
+    .diagram-box {
+      background: #ffffff;
+      border: 1.5px solid #d0e0ee;
+      border-radius: 20px;
+      padding: 16px 14px;
+      margin: 0 6px 20px 6px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .diagram-box svg { max-width: 100%; height: auto; }
+    .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .option {
+      background: white; border: 1.5px solid #d0e0ee;
+      border-radius: 60px; padding: 16px 24px;
+      font-size: 1.05rem; font-weight: 500; color: #103450;
+      cursor: pointer; transition: all 0.12s ease;
+      text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .option:hover:not(.disabled-option) {
+      background: #e6f0fc; border-color: #6f9fcf; transform: translateX(6px);
+    }
+    .option.selected { background: #d2e6ff; border-color: #1e6f9f; box-shadow: 0 0 0 2px #1e6f9f40; }
+    .option.correct-highlight { background: #c8f0d1; border-color: #2e7d5e; }
+    .option.wrong-highlight { background: #ffe0e0; border-color: #c0392b; }
+    .option.disabled-option { cursor: default; opacity: 0.9; }
+    .option .letter {
+      background: #ffffffc0; width: 32px; height: 32px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; font-weight: 700; color: #1e3c72;
+      border: 1px solid #b7d0e5; flex-shrink: 0;
+    }
+    .tf-row { display: flex; gap: 14px; margin-bottom: 20px; }
+    .tf-btn {
+      flex: 1; background: white;
+      border: 1.5px solid #d0e0ee; border-radius: 60px;
+      padding: 20px 24px; font-size: 1.15rem; font-weight: 600;
+      color: #103450; cursor: pointer; transition: all 0.12s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      text-align: center;
+    }
+    .tf-btn:hover:not(.disabled-option) {
+      background: #e6f0fc; border-color: #6f9fcf; transform: translateY(-2px);
+    }
+    .tf-btn.selected { background: #d2e6ff; border-color: #1e6f9f; box-shadow: 0 0 0 2px #1e6f9f40; }
+    .tf-btn.correct-highlight { background: #c8f0d1; border-color: #2e7d5e; }
+    .tf-btn.wrong-highlight { background: #ffe0e0; border-color: #c0392b; }
+    .tf-btn.disabled-option { cursor: default; opacity: 0.9; }
+    .input-row { display: flex; gap: 12px; margin-bottom: 20px; align-items: stretch; }
+    .input-row input {
+      flex: 1;
+      padding: 16px 22px; border-radius: 60px;
+      border: 1.5px solid #d0e0ee; background: white;
+      font-size: 1.1rem; outline: none;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+      transition: 0.2s;
+    }
+    .input-row input:focus { border-color: #1e6f9f; box-shadow: 0 0 0 4px rgba(30,111,159,0.15); }
+    .input-row input:disabled { background: #f1f5f9; opacity: 0.9; }
+    .input-row .unit-label {
+      display: inline-flex; align-items: center;
+      padding: 0 18px; font-weight: 600; color: #1e3c72;
+      background: #eef6ff; border-radius: 60px;
+      border: 1.5px solid #d0e0ee;
+    }
+    .input-row .submit-btn {
+      background: #1e3c72; color: white; border: none;
+      padding: 0 28px; border-radius: 60px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      box-shadow: 0 8px 14px -6px rgba(20,50,90,0.4);
+      transition: 0.15s;
+    }
+    .input-row .submit-btn:hover:not(:disabled) { background: #0f2b4f; }
+    .input-row .submit-btn:disabled { opacity: 0.5; cursor: default; }
+    .feedback {
+      background: #f0f7ff; border-radius: 28px;
+      padding: 16px 24px; margin-top: 6px;
+      border-left: 6px solid #1e6f9f;
+      font-size: 1rem; line-height: 1.5;
+    }
+    .feedback strong { color: #0b2b4a; }
+    .nav-buttons {
+      display: flex; gap: 16px; justify-content: space-between;
+      align-items: center; margin-top: 18px;
+    }
+    .result { display: none; text-align: center; padding: 20px 0; }
+    .result h2 { font-size: 2rem; color: #0b2b4a; margin-bottom: 16px; }
+    .final-score { font-size: 4rem; font-weight: 700; color: #1e6f9f; line-height: 1; margin: 16px 0; }
+    .review-list { text-align: left; max-height: 400px; overflow-y: auto; margin: 24px 0; padding-right: 6px; }
+    .review-item {
+      background: #fff; border-radius: 20px;
+      padding: 16px 20px; margin-bottom: 12px;
+      border-left: 6px solid #c0392b;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .review-item p { margin: 6px 0; }
+    .small-meta { font-size: 0.85rem; color: #5b7c99; margin-top: 8px; }
+    .hidden { display: none !important; }
+    .footer-note { font-size: 0.8rem; color: #6988a3; text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <div class="header">
+    <div class="badge teacher">👨‍🏫 Tr. Alex · Bahlool British International School</div>
+    <div class="badge">📘 Pearson Edexcel · Waves & EM Spectrum</div>
+    <div class="score-board" id="scoreDisplay">Score <span id="scoreValue">0</span></div>
+  </div>
+
+  <div id="coverSection" class="cover">
+    <h2>🌊 Waves &amp; EM Spectrum — Homework 2</h2>
+    <h3>Year 10 · IGCSE Physics · Pearson Edexcel</h3>
+    <p style="margin-bottom: 28px; color: #2c5778;">Enter your full name to begin</p>
+    <input type="text" id="studentName" placeholder="e.g. Jamie Chen" autocomplete="off">
+    <br>
+    <button class="btn" id="startBtn">Start Quiz →</button>
+    <div class="footer-note">25 questions · one attempt · score updates live</div>
+  </div>
+
+  <div id="quizSection" class="quiz">
+    <div class="question-text" id="questionText">Loading…</div>
+    <div id="diagramContainer"></div>
+    <div id="answerContainer"></div>
+    <div id="feedbackContainer" class="feedback hidden"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" id="prevBtn" disabled>← Previous</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <div id="resultSection" class="result">
+    <h2>📋 Quiz Complete</h2>
+    <div class="final-score" id="finalScore">0/25</div>
+    <p style="color: #2c5778; margin-bottom: 12px;">Here are your incorrect answers (with explanations):</p>
+    <div class="review-list" id="reviewList"></div>
+    <button class="btn" id="restartBtn">Try again (new attempt)</button>
+  </div>
+</div>
+
+<script>
+  // ========== GOOGLE SHEETS SETTINGS ==========
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5-uedUZMkZMtjVECaYhmjjPQWdw0D72tYeEFIBx2Qk9yKWv_5laJSOVl756axwZ3m/exec';
+  const HOMEWORK_ID = 'Y10 · Waves & EM Spectrum · Homework 2';
+  // =============================================
+
+  // ---------- SVG DIAGRAMS ----------
+
+  // 1. Water wave cross-section — smooth, starts at zero crossing
+  const SVG_WATER_WAVE = `
+<svg viewBox="0 0 540 220" style="width:100%; max-width:540px; height:auto;">
+  <line x1="40" y1="110" x2="520" y2="110" stroke="#666" stroke-width="1.2" stroke-dasharray="6 4"/>
+  <text x="6" y="114" font-family="Segoe UI" font-size="11" fill="#555">0</text>
+  <text x="6" y="24" font-family="Segoe UI" font-size="11" fill="#555">displacement</text>
+  <text x="466" y="132" font-family="Segoe UI" font-size="11" fill="#555">distance →</text>
+
+  <path d="M 40 110
+           Q 55 40, 95 40
+           Q 135 40, 150 110
+           Q 165 180, 205 180
+           Q 245 180, 260 110
+           Q 275 40, 315 40
+           Q 355 40, 370 110
+           Q 385 180, 425 180
+           Q 465 180, 480 110
+           Q 495 40, 520 40"
+        fill="none" stroke="#0d47a1" stroke-width="2.6" stroke-linecap="round"/>
+</svg>`;
+
+  // 2. Displacement vs time graph — matches Edexcel screenshot exactly
+  const SVG_OSC = `
+<svg viewBox="0 0 580 260" style="width:100%; max-width:580px; height:auto;">
+  <g stroke="#e0e8f0" stroke-width="1">
+    <line x1="60" y1="30" x2="60" y2="190"/>
+    <line x1="100" y1="30" x2="100" y2="190"/>
+    <line x1="140" y1="30" x2="140" y2="190"/>
+    <line x1="180" y1="30" x2="180" y2="190"/>
+    <line x1="220" y1="30" x2="220" y2="190"/>
+    <line x1="260" y1="30" x2="260" y2="190"/>
+    <line x1="300" y1="30" x2="300" y2="190"/>
+    <line x1="340" y1="30" x2="340" y2="190"/>
+    <line x1="380" y1="30" x2="380" y2="190"/>
+    <line x1="420" y1="30" x2="420" y2="190"/>
+    <line x1="460" y1="30" x2="460" y2="190"/>
+    <line x1="500" y1="30" x2="500" y2="190"/>
+    <line x1="540" y1="30" x2="540" y2="190"/>
+    <line x1="60" y1="30" x2="540" y2="30"/>
+    <line x1="60" y1="70" x2="540" y2="70"/>
+    <line x1="60" y1="110" x2="540" y2="110"/>
+    <line x1="60" y1="150" x2="540" y2="150"/>
+    <line x1="60" y1="190" x2="540" y2="190"/>
+  </g>
+
+  <line x1="60" y1="110" x2="540" y2="110" stroke="#000" stroke-width="1.6"/>
+  <line x1="60" y1="20" x2="60" y2="190" stroke="#000" stroke-width="1.6"/>
+
+  <text x="8" y="14" font-family="Segoe UI" font-size="11" fill="#000">displacement</text>
+  <text x="14" y="114" font-family="Segoe UI" font-size="11" fill="#000">0</text>
+
+  <g stroke="#000" stroke-width="1.5">
+    <line x1="100" y1="110" x2="100" y2="118"/>
+    <line x1="140" y1="110" x2="140" y2="118"/>
+    <line x1="180" y1="110" x2="180" y2="118"/>
+    <line x1="220" y1="110" x2="220" y2="118"/>
+    <line x1="260" y1="110" x2="260" y2="118"/>
+    <line x1="300" y1="110" x2="300" y2="118"/>
+    <line x1="340" y1="110" x2="340" y2="118"/>
+    <line x1="380" y1="110" x2="380" y2="118"/>
+    <line x1="420" y1="110" x2="420" y2="118"/>
+    <line x1="460" y1="110" x2="460" y2="118"/>
+    <line x1="500" y1="110" x2="500" y2="118"/>
+    <line x1="540" y1="110" x2="540" y2="118"/>
+  </g>
+
+  <text x="92" y="208" font-family="Segoe UI" font-size="11" fill="#000">0.1</text>
+  <text x="132" y="208" font-family="Segoe UI" font-size="11" fill="#000">0.2</text>
+  <text x="172" y="208" font-family="Segoe UI" font-size="11" fill="#000">0.3</text>
+  <text x="212" y="208" font-family="Segoe UI" font-size="11" fill="#000">0.4</text>
+  <text x="252" y="208" font-family="Segoe UI" font-size="11" fill="#000">0.5</text>
+  <text x="292" y="208" font-family="Segoe UI" font-size="11" fill="#000">0.6</text>
+  <text x="332" y="208" font-family="Segoe UI" font-size="11" fill="#000">0.7</text>
+  <text x="372" y="208" font-family="Segoe UI" font-size="11" fill="#000">0.8</text>
+  <text x="412" y="208" font-family="Segoe UI" font-size="11" fill="#000">0.9</text>
+  <text x="460" y="232" font-family="Segoe UI" font-size="11" fill="#000">time/s</text>
+
+  <path d="M 60 110
+           Q 70 40, 80 40
+           Q 90 40, 100 110
+           Q 110 180, 120 180
+           Q 130 180, 140 110
+           Q 150 40, 160 40
+           Q 170 40, 180 110
+           Q 190 180, 200 180
+           Q 210 180, 220 110
+           Q 230 40, 240 40
+           Q 250 40, 260 110
+           Q 270 180, 280 180
+           Q 290 180, 300 110
+           Q 310 40, 320 40
+           Q 330 40, 340 110
+           Q 350 180, 360 180
+           Q 370 180, 380 110
+           Q 390 40, 400 40
+           Q 410 40, 420 110
+           Q 430 180, 440 180
+           Q 450 180, 460 110
+           Q 470 40, 480 40
+           Q 490 40, 500 110
+           Q 510 180, 520 180
+           Q 530 180, 540 110"
+        fill="none" stroke="#0d47a1" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+  // ---------- QUESTIONS (25 total) ----------
+  const questions = [
+    {
+      type: 'mcq',
+      question: "The diagram shows the cross-section of a water wave. Which of the following correctly describes the amplitude?",
+      diagram: SVG_WATER_WAVE,
+      options: [
+        "The distance from one crest to the next crest",
+        "The distance from the rest position to a crest or trough",
+        "The distance from a crest to the next trough",
+        "The total height of the wave from crest to trough"
+      ],
+      correct: 1,
+      explanation: "Amplitude is the maximum displacement from the rest position — measured from the middle (dashed line) to a crest or trough."
+    },
+    {
+      type: 'mcq',
+      question: "The diagram shows the cross-section of a water wave. Which of the following correctly describes the wavelength?",
+      diagram: SVG_WATER_WAVE,
+      options: [
+        "The distance from the rest position to a crest",
+        "The distance from one crest to the next crest",
+        "The height of the wave from rest to crest",
+        "Half the distance from crest to crest"
+      ],
+      correct: 1,
+      explanation: "Wavelength (λ) is the distance between two identical points on consecutive waves — e.g. crest to crest, or trough to trough."
+    },
+    {
+      type: 'mcq',
+      question: "The graph shows the displacement of water as a wave travels through it. Use the graph to find the period of the wave.",
+      diagram: SVG_OSC,
+      options: ["0.1 s", "0.2 s", "0.4 s", "0.8 s"],
+      correct: 1,
+      explanation: "One full cycle takes from 0 to 0.2 s on the time axis — so the period is 0.2 s."
+    },
+    {
+      type: 'mcq',
+      question: "Using the same graph (displacement vs time), calculate the frequency of the wave.",
+      diagram: SVG_OSC,
+      options: ["0.2 Hz", "2 Hz", "5 Hz", "20 Hz"],
+      correct: 2,
+      explanation: "Frequency = 1 ÷ period = 1 ÷ 0.2 = 5 Hz."
+    },
+    {
+      type: 'mcq',
+      question: "What is the main difference between a transverse wave and a longitudinal wave?",
+      options: [
+        "Transverse waves have a higher frequency",
+        "In transverse waves the vibrations are perpendicular to the direction of travel; in longitudinal waves they are parallel",
+        "Transverse waves cannot be reflected; longitudinal waves can",
+        "Transverse waves are always electromagnetic; longitudinal waves are always mechanical"
+      ],
+      correct: 1,
+      explanation: "Transverse = vibrations perpendicular to travel. Longitudinal = vibrations parallel to travel."
+    },
+    {
+      type: 'mcq',
+      question: "Which of the following is an example of a transverse wave?",
+      options: [
+        "Sound wave in air",
+        "Ultrasound wave in water",
+        "Water wave",
+        "Compression wave in a spring"
+      ],
+      correct: 2,
+      explanation: "Water waves are transverse — the surface of the water moves up and down while the wave travels horizontally."
+    },
+    {
+      type: 'mcq',
+      question: "Which of the following is an example of a longitudinal wave?",
+      options: [
+        "Light wave",
+        "Sound wave in air",
+        "Water wave",
+        "Radio wave"
+      ],
+      correct: 1,
+      explanation: "Sound waves are longitudinal — air particles vibrate back and forth along the direction the sound travels."
+    },
+    {
+      type: 'mcq',
+      question: "Which type of electromagnetic wave is used for communication such as mobile phones and Wi-Fi?",
+      options: ["Infrared", "Microwaves", "Ultraviolet", "X-rays"],
+      correct: 1,
+      explanation: "Microwaves are used for mobile phones, Wi-Fi and satellite communications because they can pass through the atmosphere and carry signals over long distances."
+    },
+    {
+      type: 'mcq',
+      question: "Which type of electromagnetic wave is used in microwave ovens for cooking food?",
+      options: ["Infrared", "Microwaves", "Ultraviolet", "Radio waves"],
+      correct: 1,
+      explanation: "Microwaves are used in microwave ovens. They are absorbed by water molecules in food, causing them to vibrate and heat up."
+    },
+    {
+      type: 'mcq',
+      question: "Which type of electromagnetic wave is used to treat cancer?",
+      options: ["Infrared", "Visible light", "Gamma rays", "Radio waves"],
+      correct: 2,
+      explanation: "Gamma rays are used in radiotherapy to kill cancer cells. Their high energy damages the DNA of tumour cells."
+    },
+    {
+      type: 'mcq',
+      question: "Which type of electromagnetic wave is used in night-vision equipment to 'see' people in the dark?",
+      options: ["Ultraviolet", "Infrared", "Microwaves", "X-rays"],
+      correct: 1,
+      explanation: "All warm objects (including people) emit infrared radiation. Night-vision equipment detects this infrared to form an image."
+    },
+    {
+      type: 'mcq',
+      question: "Which type of electromagnetic wave is used for radar?",
+      options: ["Infrared", "Microwaves", "Ultraviolet", "Gamma rays"],
+      correct: 1,
+      explanation: "Radar uses microwaves. They reflect off objects such as ships and aeroplanes, allowing their position to be detected."
+    },
+    {
+      type: 'mcq',
+      question: "Which of the following is a property common to ALL electromagnetic waves?",
+      options: [
+        "They all have the same wavelength",
+        "They all have the same frequency",
+        "They all travel at the same speed in a vacuum",
+        "They all have the same amplitude"
+      ],
+      correct: 2,
+      explanation: "All electromagnetic waves travel at 3 × 10⁸ m/s in a vacuum — the speed of light. Their wavelengths and frequencies differ."
+    },
+    {
+      type: 'mcq',
+      question: "Why are X-rays used to check for broken bones?",
+      options: [
+        "X-rays are reflected by bones",
+        "X-rays are absorbed by bones and pass through softer tissue — showing a shadow of the bone on a detector",
+        "X-rays are refracted by bones",
+        "X-rays emit visible light when they hit bones"
+      ],
+      correct: 1,
+      explanation: "Bones absorb X-rays strongly, but soft tissue lets them pass through. This creates a shadow image of the bone on the photographic plate."
+    },
+    {
+      type: 'mcq',
+      question: "Why is it important to protect the ozone layer around the Earth?",
+      options: [
+        "Ozone is needed for weather",
+        "Ozone absorbs harmful ultraviolet radiation from the Sun",
+        "Ozone makes the sky blue",
+        "Ozone produces oxygen for breathing"
+      ],
+      correct: 1,
+      explanation: "The ozone layer absorbs most of the Sun's ultraviolet radiation, protecting living things from skin cancer, sunburn and DNA damage."
+    },
+
+    {
+      type: 'truefalse',
+      question: "Microwave ovens cook food much faster than normal ovens.",
+      correct: true,
+      explanation: "True. Microwaves penetrate the food and heat the water molecules inside directly, whereas normal ovens heat the air and then the food from the outside in."
+    },
+    {
+      type: 'truefalse',
+      question: "Lead screening is used to protect people from X-rays.",
+      correct: true,
+      explanation: "True. Lead absorbs X-rays strongly. Radiographers wear lead aprons and stand behind lead screens to reduce their exposure."
+    },
+    {
+      type: 'truefalse',
+      question: "Overexposure to ultraviolet waves can cause skin cancer.",
+      correct: true,
+      explanation: "True. UV radiation damages the DNA in skin cells and can lead to skin cancer, sunburn, and eye damage."
+    },
+    {
+      type: 'truefalse',
+      question: "Sound waves are transverse waves.",
+      correct: false,
+      explanation: "False. Sound waves are LONGITUDINAL — the particles of the medium vibrate parallel to the direction the sound travels."
+    },
+    {
+      type: 'truefalse',
+      question: "The frequency of a wave is measured in hertz (Hz).",
+      correct: true,
+      explanation: "True. Frequency is the number of waves per second, measured in hertz (Hz). 1 Hz = 1 wave per second."
+    },
+
+    {
+      type: 'fill',
+      question: "The equation linking wave speed (v), frequency (f) and wavelength (λ) is: v = ______",
+      answer: 'f × λ',
+      accept: [
+        'f × λ', 'f x λ', 'f * λ', 'f·λ', 'fλ', 'fxλ', 'f x lambda',
+        'frequency × wavelength', 'frequency x wavelength', 'frequency * wavelength',
+        'frequency × lambda', 'frequency x lambda',
+        'wavelength × frequency', 'wavelength x frequency',
+        'lambda × f', 'lambda x f', 'λ × f', 'λ x f', 'λf',
+        'wave speed = f × λ', 'wave speed = frequency × wavelength',
+        'speed = f × λ', 'speed = frequency × wavelength',
+        'velocity = frequency × wavelength',
+        'v = f × λ', 'v = f x λ', 'v = fλ', 'V = fλ', 'V = f × λ'
+      ],
+      formula: true,
+      explanation: "v = f × λ. Wave speed = frequency × wavelength."
+    },
+    {
+      type: 'fill',
+      question: "The period of a wave is measured in ______.",
+      answer: 'seconds',
+      accept: ['second', 'seconds', 's', 'sec', 'secs', 'second(s)', 'sec(s)'],
+      explanation: "Period is a time, so it is measured in seconds (s)."
+    },
+    {
+      type: 'fill',
+      question: "The unit of frequency is the ______.",
+      answer: 'hertz',
+      accept: ['hertz', 'hz', 'Hertz', 'Hz', 'cycles per second', 'cps'],
+      explanation: "Frequency is measured in hertz (Hz). 1 Hz = 1 wave per second."
+    },
+    {
+      type: 'fill',
+      question: "The distance from the rest position to the crest of a wave is called the ______.",
+      answer: 'amplitude',
+      accept: ['amplitude', 'Amplitude', 'max displacement', 'maximum displacement'],
+      explanation: "Amplitude = the maximum displacement from the rest position."
+    },
+    {
+      type: 'fill',
+      question: "The type of wave used in hospitals to check for broken bones is ______.",
+      answer: 'X-rays',
+      accept: [
+        'x-ray', 'x ray', 'xray', 'x-rays', 'x rays', 'xrays',
+        'X-ray', 'X ray', 'Xray', 'X-rays', 'X rays', 'Xrays',
+        'x-radiation', 'X-radiation', 'x radiation', 'X radiation'
+      ],
+      explanation: "X-rays are used to check for broken bones. Bones absorb X-rays strongly, so they show up clearly on the detector."
+    },
+
+    {
+      type: 'numeric',
+      question: "A water wave travels at 20 m/s with a wavelength of 2.5 m. Calculate the frequency of the wave.",
+      answer: 8,
+      tolerance: 0.1,
+      unit: 'Hz',
+      explanation: "v = f × λ → f = v ÷ λ = 20 ÷ 2.5 = 8 Hz."
+    },
+    {
+      type: 'numeric',
+      question: "A water wave travels at 20 m/s with a wavelength of 2.5 m. Calculate the time period of the wave.",
+      answer: 0.125,
+      tolerance: 0.005,
+      unit: 's',
+      explanation: "T = 1 ÷ f = 1 ÷ 8 = 0.125 s."
+    },
+    {
+      type: 'numeric',
+      question: "The speed of sound in water is 1500 m/s. A sound wave in water has a wavelength of 1.5 m. Calculate its frequency.",
+      answer: 1000,
+      tolerance: 5,
+      unit: 'Hz',
+      explanation: "f = v ÷ λ = 1500 ÷ 1.5 = 1000 Hz."
+    },
+    {
+      type: 'numeric',
+      question: "The speed of sound in water is 1500 m/s. A sound wave in water has a wavelength of 1.5 m. Calculate its period.",
+      answer: 0.001,
+      tolerance: 0.0005,
+      unit: 's',
+      explanation: "T = 1 ÷ f = 1 ÷ 1000 = 0.001 s."
+    },
+    {
+      type: 'numeric',
+      question: "A radio wave has frequency 200 kHz and wavelength 1500 m. Calculate the speed of the radio waves. (Give your answer in m/s.)",
+      answer: 300000000,
+      tolerance: 5000000,
+      unit: 'm/s',
+      explanation: "200 kHz = 200,000 Hz. v = f × λ = 200,000 × 1500 = 300,000,000 m/s (the speed of light)."
+    }
+  ];
+
+  // ---------- FORMULA MATCHING ----------
+  function normaliseFormula(input) {
+    let s = String(input).toLowerCase().trim();
+    s = s.replace(/[×✕✖·∙•*]/g, 'x');
+    s = s.replace(/wavelength|lambda|λ/g, 'lambda');
+    s = s.replace(/frequency|freq\b/g, 'f');
+    s = s.replace(/wavespeed|wavevelocity|velocity|speed/g, 'v');
+    s = s.replace(/\s+/g, '');
+    s = s.replace(/^v=/, '');
+    if (s === 'lambdaxf' || s === 'fxlambda') return 'fxlambda';
+    return s;
+  }
+
+  function isFormulaCorrect(input, acceptList) {
+    const n = normaliseFormula(input);
+    return acceptList.some(a => normaliseFormula(a) === n);
+  }
+
+  function isFillCorrect(q, input) {
+    if (q.formula) return isFormulaCorrect(input, q.accept);
+    const norm = String(input).toLowerCase().trim().replace(/\s+/g, ' ');
+    return q.accept.map(a => a.toLowerCase().trim().replace(/\s+/g, ' ')).includes(norm);
+  }
+
+  // ---------- STATE ----------
+  let currentIndex = 0;
+  let userAnswers = new Array(questions.length).fill(null);
+  let score = 0;
+  let quizFinished = false;
+  let studentName = "";
+  let submittedToSheet = false;
+
+  const coverSection = document.getElementById('coverSection');
+  const quizSection = document.getElementById('quizSection');
+  const resultSection = document.getElementById('resultSection');
+  const studentNameInput = document.getElementById('studentName');
+  const startBtn = document.getElementById('startBtn');
+  const questionText = document.getElementById('questionText');
+  const diagramContainer = document.getElementById('diagramContainer');
+  const answerContainer = document.getElementById('answerContainer');
+  const feedbackContainer = document.getElementById('feedbackContainer');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const scoreValue = document.getElementById('scoreValue');
+  const finalScore = document.getElementById('finalScore');
+  const reviewList = document.getElementById('reviewList');
+  const restartBtn = document.getElementById('restartBtn');
+
+  function updateScoreDisplay() { scoreValue.textContent = score; }
+
+  function renderQuestion(index) {
+    const q = questions[index];
+    questionText.textContent = `${index+1}. ${q.question}`;
+
+    diagramContainer.innerHTML = '';
+    if (q.diagram) {
+      const box = document.createElement('div');
+      box.className = 'diagram-box';
+      box.innerHTML = q.diagram;
+      diagramContainer.appendChild(box);
+    }
+
+    answerContainer.innerHTML = '';
+    feedbackContainer.classList.add('hidden');
+    feedbackContainer.innerHTML = '';
+
+    const answered = userAnswers[index] !== null;
+
+    if (q.type === 'mcq') {
+      const opts = document.createElement('div');
+      opts.className = 'options';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'option';
+        const letter = String.fromCharCode(65 + i);
+        btn.innerHTML = `<span class="letter">${letter}</span> ${opt}`;
+        if (answered && userAnswers[index] === i) btn.classList.add('selected');
+        if (!answered) btn.addEventListener('click', () => handleMCQ(index, i));
+        opts.appendChild(btn);
+      });
+      answerContainer.appendChild(opts);
+    }
+
+    if (q.type === 'truefalse') {
+      const row = document.createElement('div');
+      row.className = 'tf-row';
+      [['True', true], ['False', false]].forEach(([label, val]) => {
+        const btn = document.createElement('div');
+        btn.className = 'tf-btn';
+        btn.textContent = label;
+        if (answered && userAnswers[index] === val) btn.classList.add('selected');
+        if (!answered) btn.addEventListener('click', () => handleTF(index, val));
+        row.appendChild(btn);
+      });
+      answerContainer.appendChild(row);
+    }
+
+    if (q.type === 'fill' || q.type === 'numeric') {
+      const row = document.createElement('div');
+      row.className = 'input-row';
+      const input = document.createElement('input');
+      input.type = (q.type === 'numeric') ? 'number' : 'text';
+      if (q.type === 'numeric') input.step = 'any';
+      input.placeholder = (q.type === 'numeric') ? 'Enter a number' : 'Type your answer';
+      input.id = 'answerInput';
+      if (answered) {
+        input.value = userAnswers[index];
+        input.disabled = true;
+      }
+      row.appendChild(input);
+      if (q.unit) {
+        const u = document.createElement('div');
+        u.className = 'unit-label';
+        u.textContent = q.unit;
+        row.appendChild(u);
+      }
+      if (!answered) {
+        const s = document.createElement('button');
+        s.className = 'submit-btn';
+        s.textContent = 'Submit';
+        s.addEventListener('click', () => q.type === 'fill' ? handleFill(index) : handleNumeric(index));
+        row.appendChild(s);
+      }
+      answerContainer.appendChild(row);
+    }
+
+    if (answered) {
+      document.querySelectorAll('.option, .tf-btn').forEach(o => o.classList.add('disabled-option'));
+      showFeedbackFor(index);
+    }
+
+    prevBtn.disabled = (index === 0);
+    nextBtn.textContent = (index === questions.length - 1) ? 'Finish' : 'Next →';
+  }
+
+  function handleMCQ(qIndex, optIndex) {
+    if (userAnswers[qIndex] !== null) return;
+    userAnswers[qIndex] = optIndex;
+    if (optIndex === questions[qIndex].correct) score++;
+    updateScoreDisplay();
+    lockCurrentQuestion(qIndex, optIndex);
+    showFeedbackFor(qIndex);
+  }
+
+  function handleTF(qIndex, val) {
+    if (userAnswers[qIndex] !== null) return;
+    userAnswers[qIndex] = val;
+    if (val === questions[qIndex].correct) score++;
+    updateScoreDisplay();
+    lockCurrentQuestion(qIndex, val);
+    showFeedbackFor(qIndex);
+  }
+
+  function handleFill(qIndex) {
+    if (userAnswers[qIndex] !== null) return;
+    const input = document.getElementById('answerInput');
+    const val = (input.value || '').trim();
+    if (!val) { alert('Please type an answer first.'); return; }
+    const correct = isFillCorrect(questions[qIndex], val);
+    userAnswers[qIndex] = val;
+    if (correct) score++;
+    updateScoreDisplay();
+    input.disabled = true;
+    document.querySelector('.submit-btn').disabled = true;
+    showFeedbackFor(qIndex);
+  }
+
+  function handleNumeric(qIndex) {
+    if (userAnswers[qIndex] !== null) return;
+    const input = document.getElementById('answerInput');
+    const val = parseFloat(input.value);
+    if (isNaN(val)) { alert('Please enter a valid number.'); return; }
+    const q = questions[qIndex];
+    const correct = Math.abs(val - q.answer) <= q.tolerance;
+    userAnswers[qIndex] = val;
+    if (correct) score++;
+    updateScoreDisplay();
+    input.disabled = true;
+    document.querySelector('.submit-btn').disabled = true;
+    showFeedbackFor(qIndex);
+  }
+
+  function lockCurrentQuestion(qIndex, selected) {
+    const q = questions[qIndex];
+    document.querySelectorAll('.option').forEach((opt, i) => {
+      opt.classList.add('disabled-option');
+      if (i === q.correct) opt.classList.add('correct-highlight');
+      else if (i === selected && i !== q.correct) opt.classList.add('wrong-highlight');
+    });
+    document.querySelectorAll('.tf-btn').forEach(btn => {
+      btn.classList.add('disabled-option');
+      const isTrue = btn.textContent === 'True';
+      if (isTrue === q.correct) btn.classList.add('correct-highlight');
+      else if (isTrue === selected && isTrue !== q.correct) btn.classList.add('wrong-highlight');
+    });
+  }
+
+  function showFeedbackFor(qIndex) {
+    const q = questions[qIndex];
+    const sel = userAnswers[qIndex];
+    let correct = false;
+    let correctText = '';
+    if (q.type === 'mcq') { correct = (sel === q.correct); correctText = q.options[q.correct]; }
+    if (q.type === 'truefalse') { correct = (sel === q.correct); correctText = q.correct ? 'True' : 'False'; }
+    if (q.type === 'fill') { correct = isFillCorrect(q, sel); correctText = q.answer; }
+    if (q.type === 'numeric') { correct = Math.abs(sel - q.answer) <= q.tolerance; correctText = q.answer + (q.unit ? ' ' + q.unit : ''); }
+
+    feedbackContainer.classList.remove('hidden');
+    if (correct) {
+      feedbackContainer.innerHTML = `<strong>✅ Correct!</strong> ${q.explanation}`;
+    } else {
+      feedbackContainer.innerHTML = `<strong>❌ Incorrect.</strong> The correct answer is <strong>${correctText}</strong>.<br><span style="display:block; margin-top:8px;">📘 ${q.explanation}</span>`;
+    }
+  }
+
+  function goToNext() {
+    if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(currentIndex); }
+    else finishQuiz();
+  }
+  function goToPrev() {
+    if (currentIndex > 0) { currentIndex--; renderQuestion(currentIndex); }
+  }
+
+  function finishQuiz() {
+    quizFinished = true;
+    quizSection.style.display = 'none';
+    resultSection.style.display = 'block';
+    finalScore.textContent = `${score}/${questions.length}`;
+
+    reviewList.innerHTML = '';
+    let incorrect = 0;
+    questions.forEach((q, idx) => {
+      const sel = userAnswers[idx];
+      let isCorrect = false;
+      if (sel === null) isCorrect = false;
+      else if (q.type === 'mcq') isCorrect = (sel === q.correct);
+      else if (q.type === 'truefalse') isCorrect = (sel === q.correct);
+      else if (q.type === 'fill') isCorrect = isFillCorrect(q, sel);
+      else if (q.type === 'numeric') isCorrect = Math.abs(sel - q.answer) <= q.tolerance;
+
+      if (!isCorrect) {
+        incorrect++;
+        let correctText = '';
+        let userText = '';
+        if (q.type === 'mcq') { correctText = q.options[q.correct]; userText = (sel !== null) ? q.options[sel] : '(unanswered)'; }
+        if (q.type === 'truefalse') { correctText = q.correct ? 'True' : 'False'; userText = (sel !== null) ? (sel ? 'True' : 'False') : '(unanswered)'; }
+        if (q.type === 'fill') { correctText = q.answer; userText = sel || '(unanswered)'; }
+        if (q.type === 'numeric') { correctText = q.answer + (q.unit ? ' ' + q.unit : ''); userText = (sel !== null) ? sel + (q.unit ? ' ' + q.unit : '') : '(unanswered)'; }
+        const div = document.createElement('div');
+        div.className = 'review-item';
+        div.innerHTML = `
+          <p><strong>Q${idx+1}: ${q.question}</strong></p>
+          <p>❌ Your answer: ${userText}</p>
+          <p>✅ Correct: ${correctText}</p>
+          <p class="small-meta">📘 ${q.explanation}</p>
+        `;
+        reviewList.appendChild(div);
+      }
+    });
+    if (incorrect === 0) {
+      reviewList.innerHTML = '<p style="text-align:center; padding:20px;">🎉 Perfect! You got all answers correct!</p>';
+    }
+
+    if (!submittedToSheet) {
+      submitToSheet(studentName, score, questions.length);
+      submittedToSheet = true;
+    }
+  }
+
+  function submitToSheet(name, scoreVal, total) {
+    if (!SCRIPT_URL || SCRIPT_URL.includes('···')) {
+      console.warn('Google Sheets URL not set.');
+      return;
+    }
+    const payload = { homework: HOMEWORK_ID, name: name, score: scoreVal, total: total, firstAttempt: true };
+    fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors', redirect: 'follow',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => console.log('Score sent to Google Sheets'))
+    .catch(err => console.error('Error sending to sheet:', err));
+  }
+
+  function startQuiz() {
+    const name = studentNameInput.value.trim();
+    if (!name) { alert('Please enter your name before starting.'); return; }
+    studentName = name;
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false;
+    coverSection.style.display = 'none';
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    renderQuestion(0);
+  }
+
+  function restartQuiz() {
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false;
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    coverSection.style.display = 'none';
+    renderQuestion(0);
+  }
+
+  startBtn.addEventListener('click', startQuiz);
+  studentNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') startQuiz(); });
+  prevBtn.addEventListener('click', goToPrev);
+  nextBtn.addEventListener('click', goToNext);
+  restartBtn.addEventListener('click', restartQuiz);
+
+  quizSection.style.display = 'none';
+  resultSection.style.display = 'none';
+  updateScoreDisplay();
+</script>
+</body>
+</html>
