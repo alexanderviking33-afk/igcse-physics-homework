@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doppler Effect · Homework · Tr. Alex · Bahlool British International School</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(145deg, #f5f9ff 0%, #dae5f0 100%);
+      min-height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      padding: 20px;
+    }
+    .app-container {
+      width: 100%; max-width: 920px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 48px;
+      box-shadow: 0 30px 50px rgba(0, 20, 40, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
+      padding: 32px 30px;
+    }
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    .badge {
+      background: #1e3c72; color: white;
+      padding: 6px 16px; border-radius: 40px;
+      font-size: 0.85rem; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .teacher { background: #2b5876; }
+    .score-board {
+      background: #ffffffd9; border-radius: 40px;
+      padding: 8px 22px; font-weight: 600; color: #0b2b4a;
+      border: 1px solid #b7d0e5;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+      font-size: 1.1rem;
+    }
+    .score-board span { color: #1e6f9f; font-size: 1.4rem; margin-left: 8px; }
+    .cover { text-align: center; padding: 20px 10px; }
+    .cover h2 { font-size: 2rem; color: #0b2b4a; margin-bottom: 10px; }
+    .cover h3 { font-size: 1.2rem; font-weight: 400; color: #2c5778; margin-bottom: 28px; }
+    .cover input {
+      width: 80%; max-width: 350px;
+      padding: 16px 22px; border-radius: 60px;
+      border: 1px solid #b7d0e5; background: white;
+      font-size: 1.1rem; outline: none;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02), 0 6px 12px rgba(0,0,0,0.05);
+      margin-bottom: 25px; transition: 0.2s; text-align: center;
+    }
+    .cover input:focus { border-color: #1e6f9f; box-shadow: 0 0 0 4px rgba(30,111,159,0.15); }
+    .btn {
+      background: #1e3c72; color: white; border: none;
+      padding: 14px 38px; border-radius: 60px;
+      font-size: 1.1rem; font-weight: 600; cursor: pointer;
+      box-shadow: 0 12px 18px -6px rgba(20, 50, 90, 0.4);
+      transition: 0.15s; border: 1px solid #ffffff50;
+    }
+    .btn:hover { background: #0f2b4f; transform: scale(1.02); }
+    .btn:active { transform: scale(0.98); }
+    .btn.secondary {
+      background: #ffffff; color: #1e3c72;
+      border: 1.5px solid #1e3c72;
+      box-shadow: 0 8px 14px -8px rgba(0,0,0,0.2);
+    }
+    .btn.secondary:hover { background: #e9f0f9; }
+    .quiz { display: none; }
+    .question-text {
+      font-size: 1.3rem; font-weight: 500; line-height: 1.5;
+      margin: 25px 0 18px 0; color: #0b2b4a; padding: 0 6px;
+    }
+    .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .option {
+      background: white; border: 1.5px solid #d0e0ee;
+      border-radius: 60px; padding: 16px 24px;
+      font-size: 1.05rem; font-weight: 500; color: #103450;
+      cursor: pointer; transition: all 0.12s ease;
+      text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .option:hover:not(.disabled-option) {
+      background: #e6f0fc; border-color: #6f9fcf; transform: translateX(6px);
+    }
+    .option.selected { background: #d2e6ff; border-color: #1e6f9f; box-shadow: 0 0 0 2px #1e6f9f40; }
+    .option.correct-highlight { background: #c8f0d1; border-color: #2e7d5e; }
+    .option.wrong-highlight { background: #ffe0e0; border-color: #c0392b; }
+    .option.disabled-option { cursor: default; opacity: 0.9; }
+    .option .letter {
+      background: #ffffffc0; width: 32px; height: 32px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; font-weight: 700; color: #1e3c72;
+      border: 1px solid #b7d0e5; flex-shrink: 0;
+    }
+    .tf-row { display: flex; gap: 14px; margin-bottom: 20px; }
+    .tf-btn {
+      flex: 1; background: white;
+      border: 1.5px solid #d0e0ee; border-radius: 60px;
+      padding: 20px 24px; font-size: 1.15rem; font-weight: 600;
+      color: #103450; cursor: pointer; transition: all 0.12s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      text-align: center;
+    }
+    .tf-btn:hover:not(.disabled-option) {
+      background: #e6f0fc; border-color: #6f9fcf; transform: translateY(-2px);
+    }
+    .tf-btn.selected { background: #d2e6ff; border-color: #1e6f9f; box-shadow: 0 0 0 2px #1e6f9f40; }
+    .tf-btn.correct-highlight { background: #c8f0d1; border-color: #2e7d5e; }
+    .tf-btn.wrong-highlight { background: #ffe0e0; border-color: #c0392b; }
+    .tf-btn.disabled-option { cursor: default; opacity: 0.9; }
+    .input-row { display: flex; gap: 12px; margin-bottom: 20px; align-items: stretch; }
+    .input-row input {
+      flex: 1;
+      padding: 16px 22px; border-radius: 60px;
+      border: 1.5px solid #d0e0ee; background: white;
+      font-size: 1.1rem; outline: none;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+      transition: 0.2s;
+    }
+    .input-row input:focus { border-color: #1e6f9f; box-shadow: 0 0 0 4px rgba(30,111,159,0.15); }
+    .input-row input:disabled { background: #f1f5f9; opacity: 0.9; }
+    .input-row .submit-btn {
+      background: #1e3c72; color: white; border: none;
+      padding: 0 28px; border-radius: 60px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      box-shadow: 0 8px 14px -6px rgba(20,50,90,0.4);
+      transition: 0.15s;
+    }
+    .input-row .submit-btn:hover:not(:disabled) { background: #0f2b4f; }
+    .input-row .submit-btn:disabled { opacity: 0.5; cursor: default; }
+    .feedback {
+      background: #f0f7ff; border-radius: 28px;
+      padding: 16px 24px; margin-top: 6px;
+      border-left: 6px solid #1e6f9f;
+      font-size: 1rem; line-height: 1.5;
+    }
+    .feedback strong { color: #0b2b4a; }
+    .nav-buttons {
+      display: flex; gap: 16px; justify-content: space-between;
+      align-items: center; margin-top: 18px;
+    }
+    .result { display: none; text-align: center; padding: 20px 0; }
+    .result h2 { font-size: 2rem; color: #0b2b4a; margin-bottom: 16px; }
+    .final-score { font-size: 4rem; font-weight: 700; color: #1e6f9f; line-height: 1; margin: 16px 0; }
+    .review-list { text-align: left; max-height: 500px; overflow-y: auto; margin: 24px 0; padding-right: 6px; }
+    .review-item {
+      background: #fff; border-radius: 20px;
+      padding: 16px 20px; margin-bottom: 12px;
+      border-left: 6px solid #c0392b;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .review-item p { margin: 6px 0; }
+    .small-meta { font-size: 0.85rem; color: #5b7c99; margin-top: 8px; }
+    .hidden { display: none !important; }
+    .footer-note { font-size: 0.8rem; color: #6988a3; text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <div class="header">
+    <div class="badge teacher">👨‍🏫 Tr. Alex · Bahlool British International School</div>
+    <div class="badge">📘 Pearson Edexcel · Doppler Effect</div>
+    <div class="score-board" id="scoreDisplay">Score <span id="scoreValue">0</span></div>
+  </div>
+
+  <div id="coverSection" class="cover">
+    <h2>🎵 Doppler Effect — Homework</h2>
+    <h3>Year 10 · IGCSE Physics · Pearson Edexcel</h3>
+    <p style="margin-bottom: 28px; color: #2c5778;">Enter your full name to begin</p>
+    <input type="text" id="studentName" placeholder="e.g. Jamie Chen" autocomplete="off">
+    <br>
+    <button class="btn" id="startBtn">Start Quiz →</button>
+    <div class="footer-note">20 questions · one attempt · score updates live</div>
+  </div>
+
+  <div id="quizSection" class="quiz">
+    <div class="question-text" id="questionText">Loading…</div>
+    <div id="diagramContainer"></div>
+    <div id="answerContainer"></div>
+    <div id="feedbackContainer" class="feedback hidden"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" id="prevBtn" disabled>← Previous</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <div id="resultSection" class="result">
+    <h2>📋 Quiz Complete</h2>
+    <div class="final-score" id="finalScore">0/20</div>
+    <p style="color: #2c5778; margin-bottom: 12px;">Here are your incorrect answers (with explanations):</p>
+    <div class="review-list" id="reviewList"></div>
+    <button class="btn" id="restartBtn">Try again (new attempt)</button>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5-uedUZMkZMtjVECaYhmjjPQWdw0D72tYeEFIBx2Qk9yKWv9_5laJSOVl756axwZ3m/exec';
+  const HOMEWORK_ID = 'Y10 · Doppler Effect · Homework 1';
+
+  // ============ 20 QUALITATIVE QUESTIONS (no calculations) ============
+  const questions = [
+    // ---- Q1–Q5: Definition & core concept ----
+    {
+      type: 'mcq',
+      question: "What is the Doppler Effect?",
+      options: [
+        "The change in observed frequency and wavelength when a wave source moves relative to an observer",
+        "The bending of waves when they pass through different materials",
+        "The reflection of waves off a surface",
+        "The change in the speed of a wave when the source moves"
+      ],
+      correct: 0,
+      explanation: "The Doppler Effect is the change in observed frequency and wavelength when there is relative motion between a wave source and an observer."
+    },
+    {
+      type: 'mcq',
+      question: "Which of the following best describes what happens to the WAVEFRONTS in front of a moving source?",
+      options: [
+        "The wavefronts get bunched up (compressed together)",
+        "The wavefronts spread further apart",
+        "The wavefronts stay exactly the same distance apart",
+        "The wavefronts stop moving"
+      ],
+      correct: 0,
+      explanation: "In front of a source moving towards an observer, the wavefronts are compressed together (bunched up). Behind the source, they are stretched apart."
+    },
+    {
+      type: 'mcq',
+      question: "Which of the following best describes what happens to the WAVEFRONTS behind a moving source?",
+      options: [
+        "They get bunched up",
+        "They spread further apart (stretched out)",
+        "They stay the same",
+        "They disappear"
+      ],
+      correct: 1,
+      explanation: "Behind a source moving away from an observer, the wavefronts are stretched further apart. This means a longer wavelength and lower frequency."
+    },
+    {
+      type: 'mcq',
+      question: "A wave source is moving TOWARDS an observer. Compared to the emitted wave, the observed wave has:",
+      options: [
+        "A higher frequency and shorter wavelength",
+        "A lower frequency and longer wavelength",
+        "The same frequency and same wavelength",
+        "A higher frequency and longer wavelength"
+      ],
+      correct: 0,
+      explanation: "Approaching source → wavefronts compressed → shorter wavelength → higher frequency."
+    },
+    {
+      type: 'mcq',
+      question: "A wave source is moving AWAY from an observer. Compared to the emitted wave, the observed wave has:",
+      options: [
+        "A higher frequency and shorter wavelength",
+        "A lower frequency and longer wavelength",
+        "The same frequency and same wavelength",
+        "A higher frequency and longer wavelength"
+      ],
+      correct: 1,
+      explanation: "Receding source → wavefronts stretched → longer wavelength → lower frequency."
+    },
+
+    // ---- Q6–Q10: Real-world audio scenarios ----
+    {
+      type: 'mcq',
+      question: "An ambulance is moving TOWARDS you with its siren on. Compared to the sound heard by the driver, the sound you hear has:",
+      options: [
+        "A higher pitch (higher frequency)",
+        "A lower pitch (lower frequency)",
+        "The same pitch",
+        "No sound at all"
+      ],
+      correct: 0,
+      explanation: "As the ambulance approaches, the wavefronts are compressed, so the observed frequency is higher — you hear a higher pitch."
+    },
+    {
+      type: 'mcq',
+      question: "A racing car is moving AWAY from a stationary spectator. Compared to the actual sound produced by the engine, the sound heard by the spectator has:",
+      options: [
+        "A higher frequency",
+        "A lower frequency",
+        "The same frequency",
+        "A higher speed of sound"
+      ],
+      correct: 1,
+      explanation: "As the car moves away, the wavefronts are stretched out. This means a lower observed frequency — you hear a lower pitch."
+    },
+    {
+      type: 'mcq',
+      question: "A police car with its siren on drives past you. What happens to the pitch of the siren as it passes?",
+      options: [
+        "It gradually increases throughout",
+        "It gradually decreases throughout",
+        "It is higher as it approaches, then drops as it moves away",
+        "It stays exactly the same"
+      ],
+      correct: 2,
+      explanation: "As the police car approaches, the observed frequency is higher (higher pitch). As it moves away, the observed frequency is lower (lower pitch). The transition is abrupt at the moment it passes."
+    },
+    {
+      type: 'mcq',
+      question: "A train is approaching a station at constant speed with its horn sounding. Which statement about the observed frequency is correct?",
+      options: [
+        "The frequency heard by people on the platform is HIGHER than the frequency heard by passengers on the train",
+        "The frequency heard by people on the platform is LOWER than the frequency heard by passengers on the train",
+        "The frequency is the same for everyone",
+        "The frequency changes but the wavelength stays the same"
+      ],
+      correct: 0,
+      explanation: "As the train approaches, the wavefronts are compressed together in front of the train, giving a higher observed frequency for people on the platform."
+    },
+    {
+      type: 'mcq',
+      question: "You are standing on a platform and a train sounding its horn passes by without stopping. What do you hear?",
+      options: [
+        "A sudden increase in pitch as the train passes",
+        "A sudden decrease in pitch as the train passes",
+        "No change in pitch at all",
+        "The pitch stays high the whole time"
+      ],
+      correct: 1,
+      explanation: "Before the train passes, the pitch is higher. As it passes and moves away, the pitch drops suddenly. This is the classic 'eeeeee-yooooow' sound of the Doppler Effect."
+    },
+
+    // ---- Q11–Q14: Light & astronomy ----
+    {
+      type: 'mcq',
+      question: "Light from a star moving TOWARDS the Earth is shifted towards the blue end of the visible spectrum. What does this tell us?",
+      options: [
+        "The star is moving away from the Earth",
+        "The star is moving towards the Earth",
+        "The star is stationary",
+        "The star is getting hotter"
+      ],
+      correct: 1,
+      explanation: "Blue-shift (shift towards shorter wavelengths) means the source is moving towards the observer."
+    },
+    {
+      type: 'mcq',
+      question: "Light from a galaxy is observed to be RED-SHIFTED. What does this tell us about the galaxy?",
+      options: [
+        "It is moving towards Earth",
+        "It is moving away from Earth",
+        "It is stationary",
+        "It is losing energy"
+      ],
+      correct: 1,
+      explanation: "Red-shift means the observed wavelengths are longer than the emitted wavelengths. This happens when a source is moving away from the observer."
+    },
+    {
+      type: 'mcq',
+      question: "Why is the Doppler Effect used in astronomy to study distant galaxies?",
+      options: [
+        "To measure the temperature of galaxies",
+        "To determine whether galaxies are moving towards or away from Earth",
+        "To measure the mass of galaxies",
+        "To find the exact distance to galaxies"
+      ],
+      correct: 1,
+      explanation: "Red-shift (wavelengths stretched) indicates a galaxy is moving away. Blue-shift (wavelengths compressed) indicates it is moving towards us. This reveals the expansion of the Universe."
+    },
+    {
+      type: 'mcq',
+      question: "Almost all distant galaxies show red-shift in their light. What does this tell us about the Universe?",
+      options: [
+        "The Universe is contracting (getting smaller)",
+        "The Universe is expanding (getting bigger)",
+        "The Universe is stationary",
+        "The Universe is cooling down"
+      ],
+      correct: 1,
+      explanation: "If most galaxies are red-shifted, they are moving away from us. The farther they are, the faster they move — evidence that the Universe is expanding."
+    },
+
+    // ---- Q15–Q17: Technology applications ----
+    {
+      type: 'mcq',
+      question: "A radar speed gun emits radio waves towards a car. The car reflects the waves back. If the car is moving TOWARDS the gun, what happens to the frequency of the reflected waves?",
+      options: [
+        "The frequency increases",
+        "The frequency decreases",
+        "The frequency stays the same",
+        "The waves stop reflecting"
+      ],
+      correct: 0,
+      explanation: "This is a double Doppler effect: the car acts as a moving observer (frequency increased) and then as a moving source of reflected waves (frequency increased again)."
+    },
+    {
+      type: 'mcq',
+      question: "Doctors can use ultrasound and the Doppler Effect to check the blood flow in a patient's arteries. What does a change in the reflected wave's frequency tell them?",
+      options: [
+        "The temperature of the blood",
+        "The speed and direction of blood flow",
+        "The colour of the blood",
+        "The volume of blood"
+      ],
+      correct: 1,
+      explanation: "Moving blood cells reflect ultrasound waves. The Doppler shift in the reflected waves tells the doctor how fast the blood is flowing and in which direction."
+    },
+    {
+      type: 'mcq',
+      question: "Why do we NOT usually notice the Doppler Effect for light from a car's headlights as it drives past us?",
+      options: [
+        "Because light doesn't experience the Doppler Effect",
+        "Because the speed of the car is far too small compared to the speed of light",
+        "Because headlights emit only one frequency",
+        "Because we can't see light moving"
+      ],
+      correct: 1,
+      explanation: "The Doppler shift for light depends on the ratio of the source's speed to the speed of light. A car moves at a tiny fraction of the speed of light, so the shift is far too small to see."
+    },
+
+    // ---- Q18–Q20: True/False to test misconceptions ----
+    {
+      type: 'truefalse',
+      question: "The Doppler Effect changes the speed of the wave.",
+      correct: false,
+      explanation: "The speed of the wave in a given medium stays the same. What changes is the observed frequency and wavelength due to relative motion between source and observer."
+    },
+    {
+      type: 'truefalse',
+      question: "When a source moves away from an observer, the observed wavelength is longer than the emitted wavelength.",
+      correct: true,
+      explanation: "True. When a source moves away, the wavefronts are stretched out, so the observed wavelength is longer."
+    },
+    {
+      type: 'truefalse',
+      question: "Red-shift means that light from a distant galaxy has a shorter wavelength than when it was emitted.",
+      correct: false,
+      explanation: "False. Red-shift means LONGER wavelength, not shorter. The light is shifted towards the red end of the spectrum."
+    }
+  ];
+
+  let currentIndex = 0;
+  let userAnswers = new Array(questions.length).fill(null);
+  let score = 0;
+  let quizFinished = false;
+  let studentName = "";
+  let submittedToSheet = false;
+
+  const coverSection = document.getElementById('coverSection');
+  const quizSection = document.getElementById('quizSection');
+  const resultSection = document.getElementById('resultSection');
+  const studentNameInput = document.getElementById('studentName');
+  const startBtn = document.getElementById('startBtn');
+  const questionText = document.getElementById('questionText');
+  const diagramContainer = document.getElementById('diagramContainer');
+  const answerContainer = document.getElementById('answerContainer');
+  const feedbackContainer = document.getElementById('feedbackContainer');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const scoreValue = document.getElementById('scoreValue');
+  const finalScore = document.getElementById('finalScore');
+  const reviewList = document.getElementById('reviewList');
+  const restartBtn = document.getElementById('restartBtn');
+
+  function updateScoreDisplay() { scoreValue.textContent = score; }
+
+  function renderQuestion(index) {
+    const q = questions[index];
+    questionText.textContent = `${index+1}. ${q.question}`;
+    answerContainer.innerHTML = '';
+    feedbackContainer.classList.add('hidden');
+    feedbackContainer.innerHTML = '';
+    const answered = userAnswers[index] !== null;
+
+    if (q.type === 'mcq') {
+      const opts = document.createElement('div');
+      opts.className = 'options';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'option';
+        const letter = String.fromCharCode(65 + i);
+        btn.innerHTML = `<span class="letter">${letter}</span> ${opt}`;
+        if (answered && userAnswers[index] === i) btn.classList.add('selected');
+        if (!answered) btn.addEventListener('click', () => handleMCQ(index, i));
+        opts.appendChild(btn);
+      });
+      answerContainer.appendChild(opts);
+    }
+
+    if (q.type === 'truefalse') {
+      const row = document.createElement('div');
+      row.className = 'tf-row';
+      [['True', true], ['False', false]].forEach(([label, val]) => {
+        const btn = document.createElement('div');
+        btn.className = 'tf-btn';
+        btn.textContent = label;
+        if (answered && userAnswers[index] === val) btn.classList.add('selected');
+        if (!answered) btn.addEventListener('click', () => handleTF(index, val));
+        row.appendChild(btn);
+      });
+      answerContainer.appendChild(row);
+    }
+
+    if (answered) {
+      document.querySelectorAll('.option, .tf-btn').forEach(o => o.classList.add('disabled-option'));
+      showFeedbackFor(index);
+    }
+    prevBtn.disabled = (index === 0);
+    nextBtn.textContent = (index === questions.length - 1) ? 'Finish' : 'Next →';
+  }
+
+  function handleMCQ(qIndex, optIndex) {
+    if (userAnswers[qIndex] !== null) return;
+    userAnswers[qIndex] = optIndex;
+    if (optIndex === questions[qIndex].correct) score++;
+    updateScoreDisplay();
+    lockCurrentQuestion(qIndex, optIndex);
+    showFeedbackFor(qIndex);
+  }
+
+  function handleTF(qIndex, val) {
+    if (userAnswers[qIndex] !== null) return;
+    userAnswers[qIndex] = val;
+    if (val === questions[qIndex].correct) score++;
+    updateScoreDisplay();
+    lockCurrentQuestion(qIndex, val);
+    showFeedbackFor(qIndex);
+  }
+
+  function lockCurrentQuestion(qIndex, selected) {
+    const q = questions[qIndex];
+    document.querySelectorAll('.option').forEach((opt, i) => {
+      opt.classList.add('disabled-option');
+      if (i === q.correct) opt.classList.add('correct-highlight');
+      else if (i === selected && i !== q.correct) opt.classList.add('wrong-highlight');
+    });
+    document.querySelectorAll('.tf-btn').forEach(btn => {
+      btn.classList.add('disabled-option');
+      const isTrue = btn.textContent === 'True';
+      if (isTrue === q.correct) btn.classList.add('correct-highlight');
+      else if (isTrue === selected && isTrue !== q.correct) btn.classList.add('wrong-highlight');
+    });
+  }
+
+  function showFeedbackFor(qIndex) {
+    const q = questions[qIndex];
+    const sel = userAnswers[qIndex];
+    let correct = false, correctText = '';
+    if (q.type === 'mcq') { correct = (sel === q.correct); correctText = q.options[q.correct]; }
+    if (q.type === 'truefalse') { correct = (sel === q.correct); correctText = q.correct ? 'True' : 'False'; }
+
+    feedbackContainer.classList.remove('hidden');
+    if (correct) {
+      feedbackContainer.innerHTML = `<strong>✅ Correct!</strong> <span>${q.explanation}</span>`;
+    } else {
+      feedbackContainer.innerHTML = `<strong>❌ Incorrect.</strong> The correct answer is <strong>${correctText}</strong>.<br><span style="display:block; margin-top:8px;">📘 ${q.explanation}</span>`;
+    }
+  }
+
+  function goToNext() {
+    if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(currentIndex); }
+    else finishQuiz();
+  }
+  function goToPrev() {
+    if (currentIndex > 0) { currentIndex--; renderQuestion(currentIndex); }
+  }
+
+  function finishQuiz() {
+    quizFinished = true;
+    quizSection.style.display = 'none';
+    resultSection.style.display = 'block';
+    finalScore.textContent = `${score}/${questions.length}`;
+    reviewList.innerHTML = '';
+    let incorrect = 0;
+    questions.forEach((q, idx) => {
+      const sel = userAnswers[idx];
+      let isCorrect = false;
+      if (sel === null) isCorrect = false;
+      else if (q.type === 'mcq') isCorrect = (sel === q.correct);
+      else if (q.type === 'truefalse') isCorrect = (sel === q.correct);
+      if (!isCorrect) {
+        incorrect++;
+        let correctText = '', userText = '';
+        if (q.type === 'mcq') { correctText = q.options[q.correct]; userText = (sel !== null) ? q.options[sel] : '(unanswered)'; }
+        if (q.type === 'truefalse') { correctText = q.correct ? 'True' : 'False'; userText = (sel !== null) ? (sel ? 'True' : 'False') : '(unanswered)'; }
+        const div = document.createElement('div');
+        div.className = 'review-item';
+        div.innerHTML = `
+          <p><strong>Q${idx+1}: ${q.question}</strong></p>
+          <p>❌ Your answer: ${userText}</p>
+          <p>✅ Correct: ${correctText}</p>
+          <p class="small-meta">📘 ${q.explanation}</p>
+        `;
+        reviewList.appendChild(div);
+      }
+    });
+    if (incorrect === 0) {
+      reviewList.innerHTML = '<p style="text-align:center; padding:20px;">🎉 Perfect! You got all answers correct!</p>';
+    }
+    if (!submittedToSheet) {
+      submitToSheet(studentName, score, questions.length);
+      submittedToSheet = true;
+    }
+  }
+
+  function submitToSheet(name, scoreVal, total) {
+    if (!SCRIPT_URL || SCRIPT_URL.includes('···')) { console.warn('Google Sheets URL not set.'); return; }
+    const payload = { homework: HOMEWORK_ID, name: name, score: scoreVal, total: total, firstAttempt: true };
+    fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors', redirect: 'follow',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => console.log('Score sent to Google Sheets'))
+    .catch(err => console.error('Error sending to sheet:', err));
+  }
+
+  function startQuiz() {
+    const name = studentNameInput.value.trim();
+    if (!name) { alert('Please enter your name before starting.'); return; }
+    studentName = name;
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false;
+    coverSection.style.display = 'none';
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    renderQuestion(0);
+  }
+
+  function restartQuiz() {
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false;
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    coverSection.style.display = 'none';
+    renderQuestion(0);
+  }
+
+  startBtn.addEventListener('click', startQuiz);
+  studentNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') startQuiz(); });
+  prevBtn.addEventListener('click', goToPrev);
+  nextBtn.addEventListener('click', goToNext);
+  restartBtn.addEventListener('click', restartQuiz);
+
+  quizSection.style.display = 'none';
+  resultSection.style.display = 'none';
+  updateScoreDisplay();
+</script>
+</body>
+</html>
