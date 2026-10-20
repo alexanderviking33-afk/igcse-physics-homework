@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refraction & TIR · Homework · Tr. Alex · Bahlool British International School</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(145deg, #f5f9ff 0%, #dae5f0 100%);
+      min-height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      padding: 20px;
+    }
+    .app-container {
+      width: 100%; max-width: 920px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 48px;
+      box-shadow: 0 30px 50px rgba(0, 20, 40, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
+      padding: 32px 30px;
+    }
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    .badge {
+      background: #1e3c72; color: white;
+      padding: 6px 16px; border-radius: 40px;
+      font-size: 0.85rem; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .teacher { background: #2b5876; }
+    .score-board {
+      background: #ffffffd9; border-radius: 40px;
+      padding: 8px 22px; font-weight: 600; color: #0b2b4a;
+      border: 1px solid #b7d0e5;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+      font-size: 1.1rem;
+    }
+    .score-board span { color: #1e6f9f; font-size: 1.4rem; margin-left: 8px; }
+    .cover { text-align: center; padding: 20px 10px; }
+    .cover h2 { font-size: 2rem; color: #0b2b4a; margin-bottom: 10px; }
+    .cover h3 { font-size: 1.2rem; font-weight: 400; color: #2c5778; margin-bottom: 28px; }
+    .cover input {
+      width: 80%; max-width: 350px;
+      padding: 16px 22px; border-radius: 60px;
+      border: 1px solid #b7d0e5; background: white;
+      font-size: 1.1rem; outline: none;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02), 0 6px 12px rgba(0,0,0,0.05);
+      margin-bottom: 25px; transition: 0.2s; text-align: center;
+    }
+    .cover input:focus { border-color: #1e6f9f; box-shadow: 0 0 0 4px rgba(30,111,159,0.15); }
+    .btn {
+      background: #1e3c72; color: white; border: none;
+      padding: 14px 38px; border-radius: 60px;
+      font-size: 1.1rem; font-weight: 600; cursor: pointer;
+      box-shadow: 0 12px 18px -6px rgba(20, 50, 90, 0.4);
+      transition: 0.15s; border: 1px solid #ffffff50;
+    }
+    .btn:hover { background: #0f2b4f; transform: scale(1.02); }
+    .btn:active { transform: scale(0.98); }
+    .btn.secondary {
+      background: #ffffff; color: #1e3c72;
+      border: 1.5px solid #1e3c72;
+      box-shadow: 0 8px 14px -8px rgba(0,0,0,0.2);
+    }
+    .btn.secondary:hover { background: #e9f0f9; }
+    .quiz { display: none; }
+    .question-text {
+      font-size: 1.3rem; font-weight: 500; line-height: 1.5;
+      margin: 25px 0 18px 0; color: #0b2b4a; padding: 0 6px;
+    }
+    .diagram-box {
+      background: #ffffff;
+      border: 1.5px solid #d0e0ee;
+      border-radius: 20px;
+      padding: 16px 14px;
+      margin: 0 6px 20px 6px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .diagram-box svg { max-width: 100%; height: auto; }
+    .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .option {
+      background: white; border: 1.5px solid #d0e0ee;
+      border-radius: 60px; padding: 16px 24px;
+      font-size: 1.05rem; font-weight: 500; color: #103450;
+      cursor: pointer; transition: all 0.12s ease;
+      text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .option:hover:not(.disabled-option) {
+      background: #e6f0fc; border-color: #6f9fcf; transform: translateX(6px);
+    }
+    .option.selected { background: #d2e6ff; border-color: #1e6f9f; box-shadow: 0 0 0 2px #1e6f9f40; }
+    .option.correct-highlight { background: #c8f0d1; border-color: #2e7d5e; }
+    .option.wrong-highlight { background: #ffe0e0; border-color: #c0392b; }
+    .option.disabled-option { cursor: default; opacity: 0.9; }
+    .option .letter {
+      background: #ffffffc0; width: 32px; height: 32px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; font-weight: 700; color: #1e3c72;
+      border: 1px solid #b7d0e5; flex-shrink: 0;
+    }
+    .input-row { display: flex; gap: 12px; margin-bottom: 20px; align-items: stretch; }
+    .input-row input {
+      flex: 1;
+      padding: 16px 22px; border-radius: 60px;
+      border: 1.5px solid #d0e0ee; background: white;
+      font-size: 1.1rem; outline: none;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+      transition: 0.2s;
+    }
+    .input-row input:focus { border-color: #1e6f9f; box-shadow: 0 0 0 4px rgba(30,111,159,0.15); }
+    .input-row input:disabled { background: #f1f5f9; opacity: 0.9; }
+    .input-row .unit-label {
+      display: inline-flex; align-items: center;
+      padding: 0 18px; font-weight: 600; color: #1e3c72;
+      background: #eef6ff; border-radius: 60px;
+      border: 1.5px solid #d0e0ee;
+    }
+    .input-row .submit-btn {
+      background: #1e3c72; color: white; border: none;
+      padding: 0 28px; border-radius: 60px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      box-shadow: 0 8px 14px -6px rgba(20,50,90,0.4);
+      transition: 0.15s;
+    }
+    .input-row .submit-btn:hover:not(:disabled) { background: #0f2b4f; }
+    .input-row .submit-btn:disabled { opacity: 0.5; cursor: default; }
+    .feedback {
+      background: #f0f7ff; border-radius: 28px;
+      padding: 16px 24px; margin-top: 6px;
+      border-left: 6px solid #1e6f9f;
+      font-size: 1rem; line-height: 1.5;
+    }
+    .feedback strong { color: #0b2b4a; }
+    .steps {
+      background: #ffffff;
+      border: 1px dashed #b7d0e5;
+      border-radius: 16px;
+      padding: 18px 22px;
+      margin-top: 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 1rem;
+      color: #0b2b4a;
+    }
+    .steps .step-line { display: block; padding: 5px 0; white-space: pre-wrap; }
+    .steps .step-gap { display: block; height: 12px; }
+    .frac {
+      display: inline-flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      vertical-align: middle; margin: 0 8px;
+      line-height: 1.2; font-weight: 500;
+    }
+    .frac .num { padding: 2px 8px 3px 8px; border-bottom: 1.8px solid #0b2b4a; }
+    .frac .den { padding: 3px 8px 2px 8px; }
+    .step-with-frac { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 0; }
+    .nav-buttons { display: flex; gap: 16px; justify-content: space-between; align-items: center; margin-top: 18px; }
+    .result { display: none; text-align: center; padding: 20px 0; }
+    .result h2 { font-size: 2rem; color: #0b2b4a; margin-bottom: 16px; }
+    .final-score { font-size: 4rem; font-weight: 700; color: #1e6f9f; line-height: 1; margin: 16px 0; }
+    .review-list { text-align: left; max-height: 500px; overflow-y: auto; margin: 24px 0; padding-right: 6px; }
+    .review-item {
+      background: #fff; border-radius: 20px;
+      padding: 16px 20px; margin-bottom: 12px;
+      border-left: 6px solid #c0392b;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .review-item p { margin: 6px 0; }
+    .small-meta { font-size: 0.85rem; color: #5b7c99; margin-top: 8px; }
+    .hidden { display: none !important; }
+    .footer-note { font-size: 0.8rem; color: #6988a3; text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <div class="header">
+    <div class="badge teacher">👨‍🏫 Tr. Alex · Bahlool British International School</div>
+    <div class="badge">📘 Pearson Edexcel · Refraction & TIR</div>
+    <div class="score-board" id="scoreDisplay">Score <span id="scoreValue">0</span></div>
+  </div>
+
+  <div id="coverSection" class="cover">
+    <h2>💡 Refraction & Total Internal Reflection</h2>
+    <h3>Year 10 · IGCSE Physics · Pearson Edexcel</h3>
+    <p style="margin-bottom: 28px; color: #2c5778;">Enter your full name to begin</p>
+    <input type="text" id="studentName" placeholder="e.g. Jamie Chen" autocomplete="off">
+    <br>
+    <button class="btn" id="startBtn">Start Quiz →</button>
+    <div class="footer-note">20 questions · one attempt · score updates live</div>
+  </div>
+
+  <div id="quizSection" class="quiz">
+    <div class="question-text" id="questionText">Loading…</div>
+    <div id="diagramContainer"></div>
+    <div id="answerContainer"></div>
+    <div id="feedbackContainer" class="feedback hidden"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" id="prevBtn" disabled>← Previous</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <div id="resultSection" class="result">
+    <h2>📋 Quiz Complete</h2>
+    <div class="final-score" id="finalScore">0/20</div>
+    <p style="color: #2c5778; margin-bottom: 12px;">Here are your incorrect answers (with full working):</p>
+    <div class="review-list" id="reviewList"></div>
+    <button class="btn" id="restartBtn">Try again (new attempt)</button>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5-uedUZMkZMtjVECaYhmjjPQWdw0D72tYeEFIBx2Qk9yKWv9_5laJSOVl756axwZ3m/exec';
+  const HOMEWORK_ID = 'Y10 · Refraction & TIR · Homework 1';
+
+  // ---------- SVG DIAGRAMS ----------
+  
+  // 1. Refraction at a boundary (less dense to more dense)
+  const SVG_REFRACTION = `
+<svg viewBox="0 0 400 260" style="width:100%; max-width:400px;">
+  <!-- Boundary -->
+  <line x1="20" y1="130" x2="380" y2="130" stroke="#000" stroke-width="2"/>
+  <text x="30" y="120" font-family="Segoe UI" font-size="12" fill="#555">Air (less dense)</text>
+  <text x="30" y="155" font-family="Segoe UI" font-size="12" fill="#555">Glass (more dense)</text>
+  
+  <!-- Normal -->
+  <line x1="200" y1="20" x2="200" y2="240" stroke="#888" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="210" y="30" font-family="Segoe UI" font-size="12" fill="#555">normal</text>
+  
+  <!-- Incident ray -->
+  <line x1="100" y1="40" x2="200" y2="130" stroke="#0d47a1" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- Refracted ray (bends towards normal) -->
+  <line x1="200" y1="130" x2="260" y2="240" stroke="#0d47a1" stroke-width="2" marker-end="url(#arr)"/>
+  
+  <!-- Angles -->
+  <path d="M 200 80 A 50 50 0 0 0 160 110" fill="none" stroke="#c0392b" stroke-width="2"/>
+  <text x="160" y="95" font-family="Segoe UI" font-size="14" fill="#c0392b" font-weight="700">i</text>
+  <path d="M 200 180 A 50 50 0 0 1 230 160" fill="none" stroke="#2e7d5e" stroke-width="2"/>
+  <text x="225" y="180" font-family="Segoe UI" font-size="14" fill="#2e7d5e" font-weight="700">r</text>
+  
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#0d47a1"/>
+    </marker>
+  </defs>
+</svg>`;
+
+  // 2. Total Internal Reflection (angle > critical angle)
+  const SVG_TIR = `
+<svg viewBox="0 0 400 260" style="width:100%; max-width:400px;">
+  <!-- Boundary -->
+  <line x1="20" y1="130" x2="380" y2="130" stroke="#000" stroke-width="2"/>
+  <text x="30" y="120" font-family="Segoe UI" font-size="12" fill="#555">Glass (more dense)</text>
+  <text x="30" y="155" font-family="Segoe UI" font-size="12" fill="#555">Air (less dense)</text>
+  
+  <!-- Normal -->
+  <line x1="200" y1="20" x2="200" y2="240" stroke="#888" stroke-width="1.5" stroke-dasharray="5 4"/>
+  
+  <!-- Incident ray (steep angle) -->
+  <line x1="120" y1="200" x2="200" y2="130" stroke="#0d47a1" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- Reflected ray (Total internal reflection) -->
+  <line x1="200" y1="130" x2="280" y2="200" stroke="#0d47a1" stroke-width="2" marker-end="url(#arr)"/>
+  
+  <!-- Critical angle label -->
+  <path d="M 200 180 A 50 50 0 0 1 160 150" fill="none" stroke="#c0392b" stroke-width="2"/>
+  <text x="150" y="170" font-family="Segoe UI" font-size="13" fill="#c0392b" font-weight="700">angle &gt; c</text>
+  
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#0d47a1"/>
+    </marker>
+  </defs>
+</svg>`;
+
+  // ---------- HELPERS ----------
+  function frac(num, den) {
+    return `<span class="frac"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+  }
+
+  function snellSteps({ n1, n2, sinI, sinR, n, unit }) {
+    if (sinR === null) {
+      // Calculate critical angle
+      return `
+<div class="step-line"><strong>n = 1 ÷ sin(c)</strong></div>
+<div class="step-gap"></div>
+<div class="step-line">Rearrange to find sin(c):</div>
+<div class="step-line">sin(c) = 1 ÷ n</div>
+<div class="step-gap"></div>
+<div class="step-line">sin(c) = 1 ÷ ${n}</div>
+<div class="step-line">sin(c) = ${(1/n).toFixed(3)}</div>
+<div class="step-gap"></div>
+<div class="step-line">c = sin⁻¹(${(1/n).toFixed(3)})</div>
+<div class="step-line">c = ${Math.round(Math.asin(1/n) * 180 / Math.PI)}°</div>`;
+    } else {
+      // Calculate refractive index
+      return `
+<div class="step-line"><strong>n = sin(i) ÷ sin(r)</strong></div>
+<div class="step-gap"></div>
+<div class="step-with-frac">n = ${frac(`sin(${sinI}°)`, `sin(${sinR}°)`)}</div>
+<div class="step-gap"></div>
+<div class="step-line">n = ${Math.sin(sinI*Math.PI/180).toFixed(3)} ÷ ${Math.sin(sinR*Math.PI/180).toFixed(3)}</div>
+<div class="step-gap"></div>
+<div class="step-line">n = ${(Math.sin(sinI*Math.PI/180) / Math.sin(sinR*Math.PI/180)).toFixed(2)}</div>`;
+    }
+  }
+
+  // ---------- 20 QUESTIONS ----------
+  const questions = [
+    // ---- Q1-Q3: Refraction Basics ----
+    { type:'mcq', diagram: SVG_REFRACTION,
+      question: "A light ray travels from air into glass. How does the ray change direction?",
+      options:["It bends away from the normal","It bends towards the normal","It does not bend","It reflects back into the air"], correct:1,
+      explanation:"When light travels from a less dense medium (air) to a more dense medium (glass), it slows down and bends TOWARDS the normal." },
+    { type:'mcq',
+      question: "When light travels from glass into air, it speeds up. What happens to the light ray?",
+      options:["It bends towards the normal","It bends away from the normal","It travels straight through","It is absorbed by the air"], correct:1,
+      explanation:"When moving from more dense to less dense, light speeds up and bends AWAY from the normal." },
+    { type:'mcq',
+      question: "What is refraction?",
+      options:["The bouncing of light off a surface","The change in direction of light as it passes from one medium to another","The splitting of white light into colours","The absorption of light by a material"], correct:1,
+      explanation:"Refraction is the change in direction of a wave as it changes speed when passing from one medium to another." },
+
+    // ---- Q4-Q6: Total Internal Reflection (TIR) ----
+    { type:'mcq', diagram: SVG_TIR,
+      question: "The diagram shows Total Internal Reflection (TIR). Under what conditions does TIR occur?",
+      options:["Light travelling from air to glass at a small angle","Light travelling from glass to air at an angle greater than the critical angle","Light hitting a mirror at 90°","Light travelling through a vacuum"], correct:1,
+      explanation:"TIR happens when light travels from a MORE dense medium to a LESS dense medium (e.g., glass to air), and the angle of incidence is GREATER than the critical angle." },
+    { type:'mcq',
+      question: "What happens to the light ray when the angle of incidence exactly equals the critical angle?",
+      options:["It reflects completely","It refracts along the boundary surface (at 90° to the normal)","It travels straight through without bending","It is completely absorbed"], correct:1,
+      explanation:"At exactly the critical angle, the refracted ray travels along the boundary surface (angle of refraction = 90°)." },
+    { type:'mcq',
+      question: "Which of the following is a practical use of Total Internal Reflection?",
+      options:["Making a plane mirror","Optical fibres for communication","A magnifying glass","A prism in a periscope"], correct:1,
+      explanation:"Optical fibres use TIR to keep light trapped inside the fibre, allowing signals to travel long distances with very little loss." },
+
+    // ---- Q7-Q12: Critical Angle & Refractive Index (Formulas) ----
+    { type:'fill',
+      question: "Write down the formula relating the refractive index (n) to the critical angle (c).",
+      answer: 'n = 1 ÷ sin(c)',
+      accept: [
+        'n = 1 / sin(c)', 'n = 1 ÷ sin c', 'n=1/sin(c)', 'n=1/sinc',
+        'n = 1/sin(c)', 'n = 1/sin c', 'sin c = 1/n', 'sin(c) = 1/n',
+        'sinc=1/n', 'sin(c)=1/n'
+      ], formula: true,
+      explanation: "The refractive index n is related to the critical angle c by the formula: n = 1 ÷ sin(c)." },
+    { type:'fill',
+      question: "Write down Snell's Law, the formula relating refractive index (n), angle of incidence (i), and angle of refraction (r).",
+      answer: 'n = sin(i) ÷ sin(r)',
+      accept: [
+        'n = sin i / sin r', 'n = sin(i)/sin(r)', 'n = sini/sinr',
+        'n = sin(i) / sin(r)', 'n = sin i / sin r', 'n = sini / sinr',
+        'n = sin(i) ÷ sin(r)', 'n=sin(i)/sin(r)'
+      ], formula: true,
+      explanation: "Snell's Law is: n = sin(i) ÷ sin(r). Note: this 'n' is the RELATIVE refractive index (n₂/n₁) if the light is not going from a vacuum." },
+    { type:'numeric',
+      question: "The refractive index of a glass block is 1.5. Calculate the critical angle (c) for light travelling from glass into air. Give your answer to the nearest degree.",
+      answer: 42, tolerance: 1, unit: '°',
+      explanation: snellSteps({ n: 1.5, sinR: null }) },
+    { type:'numeric',
+      question: "The critical angle for a certain type of glass is 41°. Calculate the refractive index (n) of this glass.",
+      answer: 1.52, tolerance: 0.05, unit: '',
+      explanation: `
+<div class="step-line"><strong>n = 1 ÷ sin(c)</strong></div>
+<div class="step-gap"></div>
+<div class="step-with-frac">n = ${frac('1', 'sin(41°)')}</div>
+<div class="step-gap"></div>
+<div class="step-line">n = 1 ÷ ${(Math.sin(41*Math.PI/180)).toFixed(3)}</div>
+<div class="step-gap"></div>
+<div class="step-line">n = ${(1/Math.sin(41*Math.PI/180)).toFixed(2)}</div>` },
+    { type:'numeric',
+      question: "A light ray travels from air into water. The angle of incidence is 45° and the angle of refraction is 32°. Calculate the refractive index of water using Snell's Law.",
+      answer: 1.33, tolerance: 0.05, unit: '',
+      explanation: snellSteps({ sinI: 45, sinR: 32 }) },
+    { type:'numeric',
+      question: "The refractive index of a diamond is 2.4. Calculate the critical angle for light travelling from diamond to air. Give your answer to the nearest degree.",
+      answer: 25, tolerance: 1, unit: '°',
+      explanation: snellSteps({ n: 2.4, sinR: null }) },
+
+    // ---- Q13-Q15: More TIR Scenarios ----
+    { type:'mcq',
+      question: "A light ray hits the boundary of a glass block from inside at 50°. The critical angle is 42°. What happens?",
+      options:["It refracts out into the air","It reflects back inside the glass (TIR)","It is absorbed by the glass","It splits into different colours"], correct:1,
+      explanation:"The angle of incidence (50°) is GREATER than the critical angle (42°). Total internal reflection occurs." },
+    { type:'mcq',
+      question: "If the angle of incidence inside an optical fibre is slightly LESS than the critical angle, what happens?",
+      options:["The light is totally internally reflected","Some light refracts out of the fibre, losing signal","The light stops moving","The light speeds up"], correct:1,
+      explanation:"If the angle is less than the critical angle, refraction occurs and the light escapes. TIR only happens when the angle is GREATER than the critical angle." },
+    { type:'truefalse',
+      question: "Total internal reflection can occur when light travels from air into glass.",
+      correct: false,
+      explanation:"False. TIR only happens when light travels from a MORE dense medium to a LESS dense medium (e.g., glass to air)." },
+
+    // ---- Q16-Q17: Refractive Index meaning ----
+    { type:'mcq',
+      question: "What does a refractive index of 1.5 for glass mean?",
+      options:["Light travels 1.5 times faster in glass than in air","Light travels 1.5 times slower in glass than in air","The glass is 1.5 metres thick","The critical angle is 1.5°"], correct:1,
+      explanation:"Refractive index is a ratio of speeds: n = speed of light in vacuum ÷ speed of light in the medium. So n=1.5 means light travels 1.5 times slower in glass." },
+    { type:'truefalse',
+      question: "The refractive index of a material has no units.",
+      correct: true,
+      explanation:"True. Refractive index is a ratio of two speeds, so the units cancel out. It has no units." },
+
+    // ---- Q18-Q20: Snell's law reverse / conceptual ----
+    { type:'numeric',
+      question: "A ray of light passes from air into a clear plastic block. The angle of incidence is 60° and the refractive index of the plastic is 1.5. Calculate the angle of refraction (r). Give your answer to the nearest degree.",
+      answer: 35, tolerance: 1, unit: '°',
+      explanation: `
+<div class="step-line"><strong>n = sin(i) ÷ sin(r)</strong></div>
+<div class="step-gap"></div>
+<div class="step-line">Rearrange to find sin(r):</div>
+<div class="step-line">sin(r) = sin(i) ÷ n</div>
+<div class="step-gap"></div>
+<div class="step-line">sin(r) = sin(60°) ÷ 1.5</div>
+<div class="step-line">sin(r) = ${(Math.sin(60*Math.PI/180)).toFixed(3)} ÷ 1.5</div>
+<div class="step-line">sin(r) = ${(Math.sin(60*Math.PI/180)/1.5).toFixed(3)}</div>
+<div class="step-gap"></div>
+<div class="step-line">r = sin⁻¹(${(Math.sin(60*Math.PI/180)/1.5).toFixed(3)})</div>
+<div class="step-line">r = ${Math.round(Math.asin(Math.sin(60*Math.PI/180)/1.5) * 180 / Math.PI)}°</div>` },
+    { type:'mcq',
+      question: "If a light ray enters a medium with a HIGHER refractive index, what happens to its speed?",
+      options:["It speeds up","It slows down","It stays the same","It stops completely"], correct:1,
+      explanation:"A higher refractive index means the medium is optically denser, so light travels slower through it." },
+    { type:'mcq',
+      question: "Which statement about the angle of incidence (i) and angle of refraction (r) is correct when light enters a denser medium?",
+      options:["i > r","i < r","i = r","r = 90°"], correct:0,
+      explanation:"When entering a denser medium, light bends towards the normal, so the angle of refraction (r) is SMALLER than the angle of incidence (i)." }
+  ];
+
+  // ---------- STATE ----------
+  let currentIndex = 0;
+  let userAnswers = new Array(questions.length).fill(null);
+  let score = 0;
+  let quizFinished = false;
+  let studentName = "";
+  let submittedToSheet = false;
+
+  const coverSection = document.getElementById('coverSection');
+  const quizSection = document.getElementById('quizSection');
+  const resultSection = document.getElementById('resultSection');
+  const studentNameInput = document.getElementById('studentName');
+  const startBtn = document.getElementById('startBtn');
+  const questionText = document.getElementById('questionText');
+  const diagramContainer = document.getElementById('diagramContainer');
+  const answerContainer = document.getElementById('answerContainer');
+  const feedbackContainer = document.getElementById('feedbackContainer');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const scoreValue = document.getElementById('scoreValue');
+  const finalScore = document.getElementById('finalScore');
+  const reviewList = document.getElementById('reviewList');
+  const restartBtn = document.getElementById('restartBtn');
+
+  function updateScoreDisplay() { scoreValue.textContent = score; }
+
+  function renderExplanation(text) {
+    const isHTML = /<div|<span/.test(text);
+    if (isHTML) return `<div class="steps">${text}</div>`;
+    const lines = String(text).split('\n');
+    let html = '<div class="steps">';
+    lines.forEach(line => {
+      if (line.trim() === '') html += '<div class="step-gap"></div>';
+      else html += `<div class="step-line">${line.replace(/</g,'&lt;')}</div>`;
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderQuestion(index) {
+    const q = questions[index];
+    questionText.textContent = `${index+1}. ${q.question}`;
+    diagramContainer.innerHTML = '';
+    if (q.diagram) {
+      const box = document.createElement('div');
+      box.className = 'diagram-box';
+      box.innerHTML = q.diagram;
+      diagramContainer.appendChild(box);
+    }
+    answerContainer.innerHTML = '';
+    feedbackContainer.classList.add('hidden');
+    feedbackContainer.innerHTML = '';
+    const answered = userAnswers[index] !== null;
+
+    if (q.type === 'mcq') {
+      const opts = document.createElement('div');
+      opts.className = 'options';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'option';
+        const letter = String.fromCharCode(65 + i);
+        btn.innerHTML = `<span class="letter">${letter}</span> ${opt}`;
+        if (answered && userAnswers[index] === i) btn.classList.add('selected');
+        if (!answered) btn.addEventListener('click', () => handleMCQ(index, i));
+        opts.appendChild(btn);
+      });
+      answerContainer.appendChild(opts);
+    }
+
+    if (q.type === 'truefalse') {
+      const row = document.createElement('div');
+      row.className = 'tf-row';
+      [['True', true], ['False', false]].forEach(([label, val]) => {
+        const btn = document.createElement('div');
+        btn.className = 'tf-btn';
+        btn.textContent = label;
+        if (answered && userAnswers[index] === val) btn.classList.add('selected');
+        if (!answered) btn.addEventListener('click', () => handleTF(index, val));
+        row.appendChild(btn);
+      });
+      answerContainer.appendChild(row);
+    }
+
+    if (q.type === 'numeric' || q.type === 'fill') {
+      const row = document.createElement('div');
+      row.className = 'input-row';
+      const input = document.createElement('input');
+      input.type = (q.type === 'numeric') ? 'number' : 'text';
+      if (q.type === 'numeric') input.step = 'any';
+      input.placeholder = (q.type === 'numeric') ? 'Enter a number' : 'Type your answer';
+      input.id = 'answerInput';
+      if (answered) { input.value = userAnswers[index]; input.disabled = true; }
+      row.appendChild(input);
+      if (q.unit) {
+        const u = document.createElement('div');
+        u.className = 'unit-label';
+        u.textContent = q.unit;
+        row.appendChild(u);
+      }
+      if (!answered) {
+        const s = document.createElement('button');
+        s.className = 'submit-btn';
+        s.textContent = 'Submit';
+        s.addEventListener('click', () => q.type === 'fill' ? handleFill(index) : handleNumeric(index));
+        row.appendChild(s);
+      }
+      answerContainer.appendChild(row);
+    }
+
+    if (answered) {
+      document.querySelectorAll('.option, .tf-btn').forEach(o => o.classList.add('disabled-option'));
+      showFeedbackFor(index);
+    }
+    prevBtn.disabled = (index === 0);
+    nextBtn.textContent = (index === questions.length - 1) ? 'Finish' : 'Next →';
+  }
+
+  function handleMCQ(qIndex, optIndex) {
+    if (userAnswers[qIndex] !== null) return;
+    userAnswers[qIndex] = optIndex;
+    if (optIndex === questions[qIndex].correct) score++;
+    updateScoreDisplay();
+    lockCurrentQuestion(qIndex, optIndex);
+    showFeedbackFor(qIndex);
+  }
+
+  function handleTF(qIndex, val) {
+    if (userAnswers[qIndex] !== null) return;
+    userAnswers[qIndex] = val;
+    if (val === questions[qIndex].correct) score++;
+    updateScoreDisplay();
+    lockCurrentQuestion(qIndex, val);
+    showFeedbackFor(qIndex);
+  }
+
+  function handleNumeric(qIndex) {
+    if (userAnswers[qIndex] !== null) return;
+    const input = document.getElementById('answerInput');
+    const val = parseFloat(input.value);
+    if (isNaN(val)) { alert('Please enter a valid number.'); return; }
+    const q = questions[qIndex];
+    const correct = Math.abs(val - q.answer) <= q.tolerance;
+    userAnswers[qIndex] = val;
+    if (correct) score++;
+    updateScoreDisplay();
+    input.disabled = true;
+    document.querySelector('.submit-btn').disabled = true;
+    showFeedbackFor(qIndex);
+  }
+
+  function handleFill(qIndex) {
+    if (userAnswers[qIndex] !== null) return;
+    const input = document.getElementById('answerInput');
+    const val = (input.value || '').trim();
+    if (!val) { alert('Please type an answer first.'); return; }
+    const q = questions[qIndex];
+    const norm = val.toLowerCase()
+      .replace(/[×✕✖·∙•*]/g,'x').replace(/\s+/g,'')
+      .replace(/÷/g,'/').replace(/=/g,'=')
+      .replace(/sin\(/g,'sin').replace(/\)/g,'');
+    const correct = q.accept.some(a => {
+      const an = a.toLowerCase().replace(/[×✕✖·∙•*]/g,'x').replace(/\s+/g,'')
+        .replace(/÷/g,'/').replace(/=/g,'=')
+        .replace(/sin\(/g,'sin').replace(/\)/g,'');
+      return an === norm;
+    });
+    userAnswers[qIndex] = val;
+    if (correct) score++;
+    updateScoreDisplay();
+    input.disabled = true;
+    document.querySelector('.submit-btn').disabled = true;
+    showFeedbackFor(qIndex);
+  }
+
+  function lockCurrentQuestion(qIndex, selected) {
+    const q = questions[qIndex];
+    document.querySelectorAll('.option').forEach((opt, i) => {
+      opt.classList.add('disabled-option');
+      if (i === q.correct) opt.classList.add('correct-highlight');
+      else if (i === selected && i !== q.correct) opt.classList.add('wrong-highlight');
+    });
+    document.querySelectorAll('.tf-btn').forEach(btn => {
+      btn.classList.add('disabled-option');
+      const isTrue = btn.textContent === 'True';
+      if (isTrue === q.correct) btn.classList.add('correct-highlight');
+      else if (isTrue === selected && isTrue !== q.correct) btn.classList.add('wrong-highlight');
+    });
+  }
+
+  function showFeedbackFor(qIndex) {
+    const q = questions[qIndex];
+    const sel = userAnswers[qIndex];
+    let correct = false, correctText = '';
+    if (q.type === 'mcq') { correct = (sel === q.correct); correctText = q.options[q.correct]; }
+    if (q.type === 'truefalse') { correct = (sel === q.correct); correctText = q.correct ? 'True' : 'False'; }
+    if (q.type === 'fill') {
+      const norm = String(sel).toLowerCase()
+        .replace(/[×✕✖·∙•*]/g,'x').replace(/\s+/g,'')
+        .replace(/÷/g,'/').replace(/=/g,'=')
+        .replace(/sin\(/g,'sin').replace(/\)/g,'');
+      correct = q.accept.some(a => {
+        const an = a.toLowerCase().replace(/[×✕✖·∙•*]/g,'x').replace(/\s+/g,'')
+          .replace(/÷/g,'/').replace(/=/g,'=')
+          .replace(/sin\(/g,'sin').replace(/\)/g,'');
+        return an === norm;
+      });
+      correctText = q.answer;
+    }
+    if (q.type === 'numeric') { correct = Math.abs(sel - q.answer) <= q.tolerance; correctText = q.answer + (q.unit ? ' ' + q.unit : ''); }
+
+    feedbackContainer.classList.remove('hidden');
+    const isCalculation = /<div|<span|Step|speed|n =/.test(q.explanation);
+    const explanationHTML = isCalculation ? renderExplanation(q.explanation) : `<span> ${q.explanation}</span>`;
+
+    if (correct) {
+      feedbackContainer.innerHTML = `<strong>✅ Correct!</strong>${explanationHTML}`;
+    } else {
+      feedbackContainer.innerHTML = `<strong>❌ Incorrect.</strong> The correct answer is <strong>${correctText}</strong>.${explanationHTML}`;
+    }
+  }
+
+  function goToNext() {
+    if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(currentIndex); }
+    else finishQuiz();
+  }
+  function goToPrev() {
+    if (currentIndex > 0) { currentIndex--; renderQuestion(currentIndex); }
+  }
+
+  function finishQuiz() {
+    quizFinished = true;
+    quizSection.style.display = 'none';
+    resultSection.style.display = 'block';
+    finalScore.textContent = `${score}/${questions.length}`;
+    reviewList.innerHTML = '';
+    let incorrect = 0;
+    questions.forEach((q, idx) => {
+      const sel = userAnswers[idx];
+      let isCorrect = false;
+      if (sel === null) isCorrect = false;
+      else if (q.type === 'mcq') isCorrect = (sel === q.correct);
+      else if (q.type === 'truefalse') isCorrect = (sel === q.correct);
+      else if (q.type === 'fill') {
+        const norm = String(sel).toLowerCase()
+          .replace(/[×✕✖·∙•*]/g,'x').replace(/\s+/g,'')
+          .replace(/÷/g,'/').replace(/=/g,'=')
+          .replace(/sin\(/g,'sin').replace(/\)/g,'');
+        isCorrect = q.accept.some(a => {
+          const an = a.toLowerCase().replace(/[×✕✖·∙•*]/g,'x').replace(/\s+/g,'')
+            .replace(/÷/g,'/').replace(/=/g,'=')
+            .replace(/sin\(/g,'sin').replace(/\)/g,'');
+          return an === norm;
+        });
+      }
+      else if (q.type === 'numeric') isCorrect = Math.abs(sel - q.answer) <= q.tolerance;
+      if (!isCorrect) {
+        incorrect++;
+        let correctText = '', userText = '';
+        if (q.type === 'mcq') { correctText = q.options[q.correct]; userText = (sel !== null) ? q.options[sel] : '(unanswered)'; }
+        if (q.type === 'truefalse') { correctText = q.correct ? 'True' : 'False'; userText = (sel !== null) ? (sel ? 'True' : 'False') : '(unanswered)'; }
+        if (q.type === 'fill') { correctText = q.answer; userText = sel || '(unanswered)'; }
+        if (q.type === 'numeric') { correctText = q.answer + (q.unit ? ' ' + q.unit : ''); userText = (sel !== null) ? sel + (q.unit ? ' ' + q.unit : '') : '(unanswered)'; }
+        const div = document.createElement('div');
+        div.className = 'review-item';
+        const isCalculation = /<div|<span|Step|speed|n =/.test(q.explanation);
+        const explanationHTML = isCalculation ? renderExplanation(q.explanation) : `<p class="small-meta">📘 ${q.explanation}</p>`;
+        div.innerHTML = `
+          <p><strong>Q${idx+1}: ${q.question}</strong></p>
+          <p>❌ Your answer: ${userText}</p>
+          <p>✅ Correct: ${correctText}</p>
+          ${explanationHTML}
+        `;
+        reviewList.appendChild(div);
+      }
+    });
+    if (incorrect === 0) {
+      reviewList.innerHTML = '<p style="text-align:center; padding:20px;">🎉 Perfect! You got all answers correct!</p>';
+    }
+    if (!submittedToSheet) {
+      submitToSheet(studentName, score, questions.length);
+      submittedToSheet = true;
+    }
+  }
+
+  function submitToSheet(name, scoreVal, total) {
+    if (!SCRIPT_URL || SCRIPT_URL.includes('···')) { console.warn('Google Sheets URL not set.'); return; }
+    const payload = { homework: HOMEWORK_ID, name: name, score: scoreVal, total: total, firstAttempt: true };
+    fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors', redirect: 'follow',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => console.log('Score sent to Google Sheets'))
+    .catch(err => console.error('Error sending to sheet:', err));
+  }
+
+  function startQuiz() {
+    const name = studentNameInput.value.trim();
+    if (!name) { alert('Please enter your name before starting.'); return; }
+    studentName = name;
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false;
+    coverSection.style.display = 'none';
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    renderQuestion(0);
+  }
+
+  function restartQuiz() {
+    currentIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    updateScoreDisplay();
+    quizFinished = false;
+    submittedToSheet = false;
+    resultSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    coverSection.style.display = 'none';
+    renderQuestion(0);
+  }
+
+  startBtn.addEventListener('click', startQuiz);
+  studentNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') startQuiz(); });
+  prevBtn.addEventListener('click', goToPrev);
+  nextBtn.addEventListener('click', goToNext);
+  restartBtn.addEventListener('click', restartQuiz);
+
+  quizSection.style.display = 'none';
+  resultSection.style.display = 'none';
+  updateScoreDisplay();
+</script>
+</body>
+</html>
